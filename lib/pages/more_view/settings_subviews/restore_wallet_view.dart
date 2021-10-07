@@ -34,12 +34,14 @@ class _RestoreWalletViewState extends State<RestoreWalletView> {
                 final btcService = Provider.of<BitcoinService>(context);
                 showModal(
                   context: context,
-                  configuration: FadeScaleTransitionConfiguration(barrierDismissible: false),
+                  configuration: FadeScaleTransitionConfiguration(
+                      barrierDismissible: false),
                   builder: (BuildContext context) {
                     return WaitDialog();
                   },
                 );
-                await btcService.recoverWalletFromBIP32SeedPhrase(textController.text);
+                await btcService
+                    .recoverWalletFromBIP32SeedPhrase(textController.text);
                 await btcService.refreshWalletData();
                 Navigator.pop(context);
                 showModal(
@@ -92,7 +94,7 @@ class InvalidInputDialog extends StatelessWidget {
       title: Text('Invalid input'),
       content: Text('Please input a valid 12-word mnemonic and try again'),
       actions: <Widget>[
-        FlatButton(
+        ElevatedButton(
           child: Text('OK'),
           onPressed: () {
             Navigator.pop(context);
@@ -116,7 +118,7 @@ class RecoveryCompleteDialog extends StatelessWidget {
         style: TextStyle(color: Colors.white),
       ),
       actions: <Widget>[
-        FlatButton(
+        ElevatedButton(
           child: Text('OK'),
           onPressed: () {
             Navigator.pop(context);

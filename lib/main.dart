@@ -85,7 +85,7 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
         brightness: Brightness.dark,
         textTheme: GoogleFonts.rubikTextTheme(),
         primaryColor: Colors.cyan,
-        accentColor: Colors.cyanAccent,
+        //accentColor: Colors.cyanAccent,
         appBarTheme: AppBarTheme(
           centerTitle: true,
           color: Color(0xff121212),
@@ -94,7 +94,8 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
       ),
       home: FutureBuilder(
         future: checkForLockscreen(),
-        builder: (BuildContext context, AsyncSnapshot<bool> shouldRouteToLockSetup) {
+        builder:
+            (BuildContext context, AsyncSnapshot<bool> shouldRouteToLockSetup) {
           if (shouldRouteToLockSetup.connectionState == ConnectionState.done) {
             if (shouldRouteToLockSetup.data) {
               return SetUpLockscreenView();

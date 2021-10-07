@@ -9,7 +9,8 @@ class SetUpLockscreenView extends StatefulWidget {
 }
 
 class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
-  PageController _pageController = PageController(initialPage: 0, keepPage: true);
+  PageController _pageController =
+      PageController(initialPage: 0, keepPage: true);
   GlobalKey<ScaffoldState> _globalKey1 = GlobalKey<ScaffoldState>();
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
@@ -57,7 +58,8 @@ class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  Text('Please choose a PIN code to secure your wallet', style: TextStyle(color: Colors.white)),
+                  Text('Please choose a PIN code to secure your wallet',
+                      style: TextStyle(color: Colors.white)),
                   SizedBox(height: 40),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
@@ -66,12 +68,15 @@ class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
                       textStyle: TextStyle(color: Colors.white),
                       fieldsCount: 4,
                       onSubmit: (String pin) {
-                        _pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.bounceIn);
+                        _pageController.nextPage(
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.bounceIn);
                         FocusScope.of(context).unfocus();
                       },
                       focusNode: _pinPutFocusNode1,
                       controller: _pinPutController1,
-                      submittedFieldDecoration: _pinPutDecoration.copyWith(borderRadius: BorderRadius.circular(20.0)),
+                      submittedFieldDecoration: _pinPutDecoration.copyWith(
+                          borderRadius: BorderRadius.circular(20.0)),
                       selectedFieldDecoration: _pinPutDecoration,
                       followingFieldDecoration: _pinPutDecoration.copyWith(
                         borderRadius: BorderRadius.circular(5.0),
@@ -106,7 +111,8 @@ class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  Text('Please confirm the chosen PIN', style: TextStyle(color: Colors.white)),
+                  Text('Please confirm the chosen PIN',
+                      style: TextStyle(color: Colors.white)),
                   SizedBox(height: 40),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
@@ -115,7 +121,8 @@ class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
                       textStyle: TextStyle(color: Colors.white),
                       fieldsCount: 4,
                       onSubmit: (String pin) async {
-                        if (_pinPutController1.text == _pinPutController2.text) {
+                        if (_pinPutController1.text ==
+                            _pinPutController2.text) {
                           FocusScope.of(context).unfocus();
 
                           final store = new FlutterSecureStorage();
@@ -137,12 +144,15 @@ class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
                           Navigator.pushNamed(context, '/mainview');
                         } else {
                           FocusScope.of(context).unfocus();
-                          _pageController.animateTo(0, duration: Duration(milliseconds: 500), curve: Curves.bounceIn);
+                          _pageController.animateTo(0,
+                              duration: Duration(milliseconds: 500),
+                              curve: Curves.bounceIn);
                           _globalKey1.currentState.hideCurrentSnackBar();
                           _globalKey1.currentState.showSnackBar(
                             SnackBar(
-                              content:
-                                  Text('PIN codes do not match. Try again.', style: TextStyle(color: Colors.white)),
+                              content: Text(
+                                  'PIN codes do not match. Try again.',
+                                  style: TextStyle(color: Colors.white)),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -152,7 +162,8 @@ class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
                       },
                       focusNode: _pinPutFocusNode2,
                       controller: _pinPutController2,
-                      submittedFieldDecoration: _pinPutDecoration.copyWith(borderRadius: BorderRadius.circular(20.0)),
+                      submittedFieldDecoration: _pinPutDecoration.copyWith(
+                          borderRadius: BorderRadius.circular(20.0)),
                       selectedFieldDecoration: _pinPutDecoration,
                       followingFieldDecoration: _pinPutDecoration.copyWith(
                         borderRadius: BorderRadius.circular(5.0),

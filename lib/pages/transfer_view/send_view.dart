@@ -24,7 +24,8 @@ class _SendViewState extends State<SendView> {
 
   // Class attributes for recipient address
   String recipientAddress;
-  TextEditingController recipientAddressTextController = TextEditingController();
+  TextEditingController recipientAddressTextController =
+      TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   // Class atributes for recipient amount
@@ -47,7 +48,8 @@ class _SendViewState extends State<SendView> {
 
   @override
   void initState() {
-    satsAmountController = TextEditingController(text: satoshiAmount.toString());
+    satsAmountController =
+        TextEditingController(text: satoshiAmount.toString());
     btcAmountController = TextEditingController(text: btcAmount.toString());
     fiatAmountController = TextEditingController(text: fiatAmount.toString());
 
@@ -70,13 +72,17 @@ class _SendViewState extends State<SendView> {
               if (fees.connectionState == ConnectionState.done) {
                 return FutureBuilder(
                   future: bitcoinService.bitcoinPrice,
-                  builder: (BuildContext context, AsyncSnapshot<dynamic> price) {
+                  builder:
+                      (BuildContext context, AsyncSnapshot<dynamic> price) {
                     if (price.connectionState == ConnectionState.done) {
                       return FutureBuilder(
                         future: bitcoinService.currency,
-                        builder: (BuildContext context, AsyncSnapshot<String> currency) {
-                          if (currency.connectionState == ConnectionState.done) {
-                            return buildPreviewButton(context, fees.data, price.data, currency.data);
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> currency) {
+                          if (currency.connectionState ==
+                              ConnectionState.done) {
+                            return buildPreviewButton(
+                                context, fees.data, price.data, currency.data);
                           } else {
                             return Container();
                           }
@@ -259,7 +265,7 @@ class _SendViewState extends State<SendView> {
         ),
       ),
       actions: [
-        FlatButton(
+        ElevatedButton(
           child: Text('SCAN QR', style: TextStyle(color: Colors.cyanAccent)),
           onPressed: () async {
             String scan = await MajaScan.startScan(
@@ -272,11 +278,11 @@ class _SendViewState extends State<SendView> {
             recipientAddressTextController.text = scan.trim();
           },
         ),
-        FlatButton(
+        ElevatedButton(
           child: Text('CANCEL', style: TextStyle(color: Colors.cyanAccent)),
           onPressed: () => Navigator.pop(context),
         ),
-        FlatButton(
+        ElevatedButton(
           child: Text('OK', style: TextStyle(color: Colors.cyanAccent)),
           onPressed: () {
             if (_formKey.currentState.validate()) {
@@ -318,12 +324,14 @@ class _SendViewState extends State<SendView> {
 
                   return FutureBuilder(
                     future: bitcoinService.currency,
-                    builder: (BuildContext context, AsyncSnapshot<String> currency) {
+                    builder:
+                        (BuildContext context, AsyncSnapshot<String> currency) {
                       if (currency.connectionState == ConnectionState.done) {
                         return Container(
                           // height: MediaQuery.of(context).size.height / 1.25,
                           color: Colors.black,
-                          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                          padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom),
                           child: SingleChildScrollView(
                             child: Padding(
                               padding: const EdgeInsets.all(12),
@@ -336,7 +344,9 @@ class _SendViewState extends State<SendView> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       GestureDetector(
-                                        onTap: () => changeDenominationSelection(0, setState),
+                                        onTap: () =>
+                                            changeDenominationSelection(
+                                                0, setState),
                                         child: Text(
                                           'BTC',
                                           style: TextStyle(
@@ -347,7 +357,9 @@ class _SendViewState extends State<SendView> {
                                       ),
                                       SizedBox(width: 12),
                                       GestureDetector(
-                                        onTap: () => changeDenominationSelection(1, setState),
+                                        onTap: () =>
+                                            changeDenominationSelection(
+                                                1, setState),
                                         child: Text(
                                           'SATS',
                                           style: TextStyle(
@@ -358,7 +370,9 @@ class _SendViewState extends State<SendView> {
                                       ),
                                       SizedBox(width: 12),
                                       GestureDetector(
-                                        onTap: () => changeDenominationSelection(2, setState),
+                                        onTap: () =>
+                                            changeDenominationSelection(
+                                                2, setState),
                                         child: Text(
                                           currency.data,
                                           style: TextStyle(
@@ -381,7 +395,8 @@ class _SendViewState extends State<SendView> {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       SizedBox(height: 8),
-                                      buildAmountInputBox(currency.data, price.data)
+                                      buildAmountInputBox(
+                                          currency.data, price.data)
                                     ],
                                   ),
 
@@ -392,80 +407,116 @@ class _SendViewState extends State<SendView> {
                                     borderRadius: BorderRadius.circular(30),
                                     child: Material(
                                       child: Ink(
-                                        decoration: BoxDecoration(color: Colors.amber),
+                                        decoration:
+                                            BoxDecoration(color: Colors.amber),
                                         child: InkWell(
                                           child: Container(
                                             height: 50,
-                                            width: MediaQuery.of(context).size.width,
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
                                             child: Center(
                                               child: Text(
                                                 'Confirm amount',
-                                                style: TextStyle(color: Color(0xff121212), fontWeight: FontWeight.bold),
+                                                style: TextStyle(
+                                                    color: Color(0xff121212),
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                             ),
                                           ),
                                           onTap: () async {
                                             // Check to see that user isnt spending 0 sats, more sats than they have, or an amount equal to that they have spendable in the first place
-                                            final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+                                            final BitcoinService
+                                                bitcoinService =
+                                                Provider.of<BitcoinService>(
+                                                    context);
 
-                                            final List<UtxoObject> allOutputs = bitcoinService.allOutputs;
+                                            final List<UtxoObject> allOutputs =
+                                                bitcoinService.allOutputs;
                                             int spendableSatoshiAmount = 0;
 
-                                            for (var i = 0; i < allOutputs.length; i++) {
-                                              if (allOutputs[i].blocked == false &&
-                                                  allOutputs[i].status.confirmed == true) {
-                                                spendableSatoshiAmount += allOutputs[i].value;
+                                            for (var i = 0;
+                                                i < allOutputs.length;
+                                                i++) {
+                                              if (allOutputs[i].blocked ==
+                                                      false &&
+                                                  allOutputs[i]
+                                                          .status
+                                                          .confirmed ==
+                                                      true) {
+                                                spendableSatoshiAmount +=
+                                                    allOutputs[i].value;
                                               }
                                             }
 
                                             final int satoshiAmountInt =
-                                                double.parse(satsAmountController.text).toInt();
+                                                double.parse(
+                                                        satsAmountController
+                                                            .text)
+                                                    .toInt();
 
                                             if (satoshiAmountInt == 0) {
                                               this.setState(() {
                                                 satsAmountController.text = '0';
-                                                btcAmountController.text = '0.0';
-                                                fiatAmountController.text = '0.00';
+                                                btcAmountController.text =
+                                                    '0.0';
+                                                fiatAmountController.text =
+                                                    '0.00';
                                                 showFinalTxDetails = false;
                                               });
 
                                               showModal(
                                                 context: context,
-                                                configuration: FadeScaleTransitionConfiguration(),
-                                                builder: (BuildContext context) {
-                                                  return zeroAmountDialog(context);
+                                                configuration:
+                                                    FadeScaleTransitionConfiguration(),
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return zeroAmountDialog(
+                                                      context);
                                                 },
                                               );
                                             } else if (satoshiAmountInt != 0 &&
-                                                satoshiAmountInt > spendableSatoshiAmount) {
+                                                satoshiAmountInt >
+                                                    spendableSatoshiAmount) {
                                               this.setState(() {
                                                 satsAmountController.text = '0';
-                                                btcAmountController.text = '0.0';
-                                                fiatAmountController.text = '0.00';
+                                                btcAmountController.text =
+                                                    '0.0';
+                                                fiatAmountController.text =
+                                                    '0.00';
                                                 showFinalTxDetails = false;
                                               });
 
                                               showModal(
                                                 context: context,
-                                                configuration: FadeScaleTransitionConfiguration(),
-                                                builder: (BuildContext context) {
+                                                configuration:
+                                                    FadeScaleTransitionConfiguration(),
+                                                builder:
+                                                    (BuildContext context) {
                                                   return tooMuchDialog(context);
                                                 },
                                               );
                                             } else if (satoshiAmountInt != 0 &&
-                                                satoshiAmountInt == spendableSatoshiAmount) {
+                                                satoshiAmountInt ==
+                                                    spendableSatoshiAmount) {
                                               this.setState(() {
                                                 satsAmountController.text = '0';
-                                                btcAmountController.text = '0.0';
-                                                fiatAmountController.text = '0.00';
+                                                btcAmountController.text =
+                                                    '0.0';
+                                                fiatAmountController.text =
+                                                    '0.00';
                                                 showFinalTxDetails = false;
                                               });
 
                                               showModal(
                                                 context: context,
-                                                configuration: FadeScaleTransitionConfiguration(),
-                                                builder: (BuildContext context) {
-                                                  return exactAmountDialog(context);
+                                                configuration:
+                                                    FadeScaleTransitionConfiguration(),
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return exactAmountDialog(
+                                                      context);
                                                 },
                                               );
                                             } else {
@@ -547,7 +598,8 @@ class _SendViewState extends State<SendView> {
                 final btcAmountNum = double.parse(btcAmount);
 
                 final satoshiAmount = ((btcAmountNum * 100000000).toInt());
-                final fiatAmountString = (btcAmountNum * bitcoinPrice).toStringAsFixed(2);
+                final fiatAmountString =
+                    (btcAmountNum * bitcoinPrice).toStringAsFixed(2);
 
                 satsAmountController.text = satoshiAmount.toString();
                 fiatAmountController.text = fiatAmountString;
@@ -572,7 +624,8 @@ class _SendViewState extends State<SendView> {
                 final satoshiAmountNum = double.parse(satoshiAmount).toInt();
 
                 final btcAmountNum = satoshiAmountNum / 100000000;
-                final fiatAmountString = (btcAmountNum * bitcoinPrice).toStringAsFixed(2);
+                final fiatAmountString =
+                    (btcAmountNum * bitcoinPrice).toStringAsFixed(2);
 
                 btcAmountController.text = btcAmountNum.toString();
                 fiatAmountController.text = fiatAmountString;
@@ -593,12 +646,15 @@ class _SendViewState extends State<SendView> {
               keyboardType: TextInputType.number,
               inputFormatters: [NumberRemoveExtraDotFormatter(decimalRange: 2)],
               style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(prefixText: currencyMap[currency] + ' '),
+              decoration:
+                  InputDecoration(prefixText: currencyMap[currency] + ' '),
               onChanged: (String fiatAmount) {
                 final fiatAmountNum = double.parse(fiatAmount);
 
-                final btcAmount = (fiatAmountNum / bitcoinPrice).toStringAsFixed(8);
-                final satoshiAmount = (double.parse(btcAmount) * 100000000).toInt();
+                final btcAmount =
+                    (fiatAmountNum / bitcoinPrice).toStringAsFixed(8);
+                final satoshiAmount =
+                    (double.parse(btcAmount) * 100000000).toInt();
 
                 btcAmountController.text = btcAmount.toString();
                 satsAmountController.text = satoshiAmount.toString();
@@ -612,9 +668,11 @@ class _SendViewState extends State<SendView> {
 
   buildSendAmountText(String currency) {
     if (currentDenominationSelection == 0) {
-      return Text(btcAmountController.text + ' BTC', style: TextStyle(color: Colors.cyanAccent));
+      return Text(btcAmountController.text + ' BTC',
+          style: TextStyle(color: Colors.cyanAccent));
     } else if (currentDenominationSelection == 1) {
-      return Text(satsAmountController.text + ' SATS', style: TextStyle(color: Colors.cyanAccent));
+      return Text(satsAmountController.text + ' SATS',
+          style: TextStyle(color: Colors.cyanAccent));
     } else {
       return Text(
         currencyMap[currency] + fiatAmountController.text + ' worth of Bitcoin',
@@ -640,12 +698,16 @@ class _SendViewState extends State<SendView> {
           }
 
           return ListTile(
-            title: Text('Fee selection:', style: TextStyle(color: Colors.white)),
-            trailing: Text(feeDescription, style: TextStyle(color: Colors.cyanAccent)),
+            title:
+                Text('Fee selection:', style: TextStyle(color: Colors.white)),
+            trailing: Text(feeDescription,
+                style: TextStyle(color: Colors.cyanAccent)),
             onTap: () => showFeeSelectionModal(),
           );
         } else {
-          return ListTile(title: Text('Fetching fee information...', style: TextStyle(color: Colors.white)));
+          return ListTile(
+              title: Text('Fetching fee information...',
+                  style: TextStyle(color: Colors.white)));
         }
       },
     );
@@ -665,7 +727,8 @@ class _SendViewState extends State<SendView> {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
             return FutureBuilder(
               future: bitcoinService.fees,
               builder: (BuildContext context, AsyncSnapshot<FeeObject> feeObj) {
@@ -689,7 +752,8 @@ class _SendViewState extends State<SendView> {
                             feeObj.data.fast.toString() + ' sats/vByte',
                             style: TextStyle(color: buildColorForTiles(0)),
                           ),
-                          trailing: Text('Fast >>>', style: TextStyle(color: buildColorForTiles(0))),
+                          trailing: Text('Fast >>>',
+                              style: TextStyle(color: buildColorForTiles(0))),
                           onTap: () {
                             setState(() {
                               feeSelection = 0;
@@ -705,7 +769,8 @@ class _SendViewState extends State<SendView> {
                             feeObj.data.medium.toString() + ' sats/vByte',
                             style: TextStyle(color: buildColorForTiles(1)),
                           ),
-                          trailing: Text('Medium >>', style: TextStyle(color: buildColorForTiles(1))),
+                          trailing: Text('Medium >>',
+                              style: TextStyle(color: buildColorForTiles(1))),
                           onTap: () {
                             setState(() {
                               feeSelection = 1;
@@ -721,7 +786,8 @@ class _SendViewState extends State<SendView> {
                             feeObj.data.slow.toString() + ' sats/vByte',
                             style: TextStyle(color: buildColorForTiles(2)),
                           ),
-                          trailing: Text('Slow >', style: TextStyle(color: buildColorForTiles(2))),
+                          trailing: Text('Slow >',
+                              style: TextStyle(color: buildColorForTiles(2))),
                           onTap: () {
                             setState(() {
                               feeSelection = 2;
@@ -744,7 +810,8 @@ class _SendViewState extends State<SendView> {
         });
   }
 
-  buildPreviewButton(BuildContext context, FeeObject feeObjRaw, dynamic bitcoinPrice, String currency) {
+  buildPreviewButton(BuildContext context, FeeObject feeObjRaw,
+      dynamic bitcoinPrice, String currency) {
     if (showFinalTxDetails) {
       return Center(
         child: ClipRRect(
@@ -754,11 +821,13 @@ class _SendViewState extends State<SendView> {
               decoration: BoxDecoration(color: Colors.amber),
               child: InkWell(
                 onTap: () async {
-                  final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+                  final BitcoinService bitcoinService =
+                      Provider.of<BitcoinService>(context);
                   // Show loading dialog
                   showModal(
                     context: context,
-                    configuration: FadeScaleTransitionConfiguration(barrierDismissible: false),
+                    configuration: FadeScaleTransitionConfiguration(
+                        barrierDismissible: false),
                     builder: (BuildContext context) {
                       return attemptBuildTransactionDialog(context);
                     },
@@ -774,7 +843,8 @@ class _SendViewState extends State<SendView> {
                     feeChosen = feeObjRaw.slow;
                   }
 
-                  final int satoshiAmountToSend = double.parse(satsAmountController.text).toInt();
+                  final int satoshiAmountToSend =
+                      double.parse(satsAmountController.text).toInt();
 
                   dynamic txHexOrError = await bitcoinService.coinSelection(
                     satoshiAmountToSend,
@@ -816,7 +886,8 @@ class _SendViewState extends State<SendView> {
                           denomination: currentDenominationSelection,
                           feeInSatoshis: txHexOrError['fee'],
                           recipient: txHexOrError['recipient'],
-                          recipientAmountInSatoshis: txHexOrError['recipientAmt'],
+                          recipientAmountInSatoshis:
+                              txHexOrError['recipientAmt'],
                         );
                       },
                     );
@@ -833,7 +904,9 @@ class _SendViewState extends State<SendView> {
                       SizedBox(width: 12),
                       Text(
                         'Preview Transaction',
-                        style: TextStyle(color: Color(0xff121212), fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Color(0xff121212),
+                            fontWeight: FontWeight.bold),
                       ),
                       Expanded(child: Container()),
                     ],
@@ -853,7 +926,8 @@ class _SendViewState extends State<SendView> {
 // Send view helper functions
 
 Text formatAddress(String address) {
-  final String formatted = address.substring(0, 4) + '...' + address.substring(address.length - 4);
+  final String formatted =
+      address.substring(0, 4) + '...' + address.substring(address.length - 4);
   return Text(
     formatted,
     style: TextStyle(color: Colors.cyanAccent),
@@ -899,7 +973,7 @@ AlertDialog exactAmountDialog(BuildContext _) {
       style: TextStyle(color: Colors.white),
     ),
     actions: [
-      FlatButton(
+      ElevatedButton(
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
@@ -922,7 +996,7 @@ AlertDialog zeroAmountDialog(BuildContext _) {
       style: TextStyle(color: Colors.white),
     ),
     actions: [
-      FlatButton(
+      ElevatedButton(
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
@@ -945,7 +1019,7 @@ AlertDialog tooMuchDialog(BuildContext _) {
       style: TextStyle(color: Colors.white),
     ),
     actions: [
-      FlatButton(
+      ElevatedButton(
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
@@ -981,7 +1055,9 @@ AlertDialog notEnoughForFeesDialog(BuildContext _) {
       'You aren\'t leaving enough over in your wallet to pay for transaction fees. Please modify amount and try again.',
       style: TextStyle(color: Colors.white),
     ),
-    actions: [FlatButton(onPressed: () => Navigator.pop(_), child: Text('OK'))],
+    actions: [
+      ElevatedButton(onPressed: () => Navigator.pop(_), child: Text('OK'))
+    ],
   );
 }
 
@@ -993,22 +1069,29 @@ AlertDialog notEnoughBalanceDialog(BuildContext _) {
       'You don\'t the amount of Bitcoin that you\'re trying to spend. Please modify amount and try again.',
       style: TextStyle(color: Colors.white),
     ),
-    actions: [FlatButton(onPressed: () => Navigator.pop(_), child: Text('OK'))],
+    actions: [
+      ElevatedButton(onPressed: () => Navigator.pop(_), child: Text('OK'))
+    ],
   );
 }
 
 class NumberRemoveExtraDotFormatter extends TextInputFormatter {
-  NumberRemoveExtraDotFormatter({this.decimalRange = 8}) : assert(decimalRange == null || decimalRange > 0);
+  NumberRemoveExtraDotFormatter({this.decimalRange = 8})
+      : assert(decimalRange == null || decimalRange > 0);
 
   final int decimalRange;
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     String nValue = newValue.text;
     TextSelection nSelection = newValue.selection;
 
     Pattern p = RegExp(r'(\d+\.?)|(\.?\d+)|(\.?)');
-    nValue = p.allMatches(nValue).map<String>((Match match) => match.group(0)).join();
+    nValue = p
+        .allMatches(nValue)
+        .map<String>((Match match) => match.group(0))
+        .join();
 
     if (nValue.startsWith('.')) {
       nValue = '0.';
@@ -1028,7 +1111,8 @@ class NumberRemoveExtraDotFormatter extends TextInputFormatter {
       extentOffset: math.min(nValue.length, nValue.length + 1),
     );
 
-    return TextEditingValue(text: nValue, selection: nSelection, composing: TextRange.empty);
+    return TextEditingValue(
+        text: nValue, selection: nSelection, composing: TextRange.empty);
   }
 }
 
@@ -1053,7 +1137,8 @@ class PreviewTransactionSubview extends StatefulWidget {
       : super(key: key);
 
   @override
-  _PreviewTransactionSubviewState createState() => _PreviewTransactionSubviewState();
+  _PreviewTransactionSubviewState createState() =>
+      _PreviewTransactionSubviewState();
 }
 
 class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
@@ -1070,7 +1155,9 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
   void pushtx() async {
     final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
     // await Future.delayed(Duration(milliseconds: 2000)).then((value) => submitButtonController.success());
-    await bitcoinService.submitHexToNetwork(widget.hex).then((booleanResponse) async {
+    await bitcoinService
+        .submitHexToNetwork(widget.hex)
+        .then((booleanResponse) async {
       if (booleanResponse == true) {
         submitButtonController.success();
         await Future.delayed(Duration(milliseconds: 1000)).then((value) {
@@ -1095,7 +1182,8 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
     } else if (viewDenomination == 1) {
       return (widget.recipientAmountInSatoshis).toString() + ' sats';
     } else if (viewDenomination == 2) {
-      final valueRaw = (widget.recipientAmountInSatoshis / 100000000) * widget.bitcoinPrice;
+      final valueRaw =
+          (widget.recipientAmountInSatoshis / 100000000) * widget.bitcoinPrice;
       FlutterMoneyFormatter fmf = FlutterMoneyFormatter(amount: valueRaw);
       return currencyMap[widget.currency] + fmf.output.nonSymbol;
     }
@@ -1129,7 +1217,8 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
             children: [
               Icon(Icons.check, color: Color(0xff121212)),
               SizedBox(width: 12),
-              Text('Submit transaction', style: TextStyle(color: Color(0xff121212))),
+              Text('Submit transaction',
+                  style: TextStyle(color: Color(0xff121212))),
             ],
           ),
         ),
@@ -1173,7 +1262,8 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
               },
             ),
             ListTile(
-              title: Text('Fee (on-chain):', style: TextStyle(color: Colors.white)),
+              title: Text('Fee (on-chain):',
+                  style: TextStyle(color: Colors.white)),
               trailing: Text(
                 buildFees(),
                 style: TextStyle(color: Colors.cyanAccent),
@@ -1191,7 +1281,8 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
               },
             ),
             ListTile(
-              title: Text('Copy transaction hex', style: TextStyle(color: Colors.cyanAccent)),
+              title: Text('Copy transaction hex',
+                  style: TextStyle(color: Colors.cyanAccent)),
               onTap: () {
                 Clipboard.setData(new ClipboardData(text: widget.hex));
                 Toast.show(
@@ -1203,9 +1294,11 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
               },
             ),
             ListTile(
-              title: Text('Save hex offline', style: TextStyle(color: Colors.grey)),
+              title: Text('Save hex offline',
+                  style: TextStyle(color: Colors.grey)),
               onTap: () {
-                Toast.show('Feature coming soon', context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                Toast.show('Feature coming soon', context,
+                    duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
               },
             )
           ],

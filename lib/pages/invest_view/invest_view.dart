@@ -24,7 +24,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
   final GlobalKey<InnerDrawerState> _drawerKey = GlobalKey<InnerDrawerState>();
 
   final List<String> countries = countryList;
-  final List<String> countriesDuplicate = new List();
+  final List<String> countriesDuplicate = [];
   TextEditingController searchEditingController = TextEditingController();
 
   Future<String> fetchCountry() async {
@@ -40,10 +40,10 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
   }
 
   void filterSearchResults(String query) {
-    List<String> dummySearchList = List<String>();
+    List<String> dummySearchList = [];
     dummySearchList.addAll(countriesDuplicate);
     if (query.isNotEmpty) {
-      List<String> dummyListData = List<String>();
+      List<String> dummyListData = [];
       dummySearchList.forEach((String item) {
         if (item.toLowerCase().contains(query.toLowerCase())) {
           dummyListData.add(item);
@@ -109,7 +109,8 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                 barCollapsingEnabled: true,
                 preferredBarTintColor: Colors.green,
                 preferredControlTintColor: Colors.amber,
-                dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
+                dismissButtonStyle:
+                    SafariViewControllerDismissButtonStyle.close,
                 modalPresentationCapturesStatusBarAppearance: true,
               ),
             );
@@ -172,7 +173,8 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                 barCollapsingEnabled: true,
                 preferredBarTintColor: Colors.green,
                 preferredControlTintColor: Colors.amber,
-                dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
+                dismissButtonStyle:
+                    SafariViewControllerDismissButtonStyle.close,
                 modalPresentationCapturesStatusBarAppearance: true,
               ),
             );
@@ -310,7 +312,8 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                 barCollapsingEnabled: true,
                 preferredBarTintColor: Colors.green,
                 preferredControlTintColor: Colors.amber,
-                dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
+                dismissButtonStyle:
+                    SafariViewControllerDismissButtonStyle.close,
                 modalPresentationCapturesStatusBarAppearance: true,
               ),
             );
@@ -454,7 +457,8 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 650));
     _animationController.repeat(reverse: true);
     for (var i = 0; i < countryList.length; i++) {
       countriesDuplicate.add(countryList[i]);
@@ -515,7 +519,8 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                           ),
                           Expanded(
                             child: ListView(
-                              children: buildListTilesForBuy(country.data, address.data),
+                              children: buildListTilesForBuy(
+                                  country.data, address.data),
                             ),
                           ),
                           Padding(
@@ -526,7 +531,9 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
-                          Expanded(child: buildListTilesForSell(country.data, address.data)),
+                          Expanded(
+                              child: buildListTilesForSell(
+                                  country.data, address.data)),
                         ],
                       ),
                     ),
@@ -591,7 +598,8 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                       ),
                       onTap: () async {
                         setState(() {});
-                        await CurrencyUtilities.setPreferredCurrency(countries[index]);
+                        await CurrencyUtilities.setPreferredCurrency(
+                            countries[index]);
                         FocusScope.of(context).unfocus();
                         Navigator.pop(context);
                       },
@@ -666,7 +674,8 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                   children: [
                     Center(
                       child: ScaleTransition(
-                        scale: Tween(begin: 0.75, end: 1.0).animate(CurvedAnimation(
+                        scale: Tween(begin: 0.75, end: 1.0)
+                            .animate(CurvedAnimation(
                           parent: _animationController,
                           curve: Curves.elasticOut,
                         )),
@@ -696,13 +705,18 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                     SizedBox(height: 32),
                     FutureBuilder(
                       future: bitcoinService.currency,
-                      builder: (BuildContext context, AsyncSnapshot<String> currencyData) {
-                        if (currencyData.connectionState == ConnectionState.done) {
+                      builder: (BuildContext context,
+                          AsyncSnapshot<String> currencyData) {
+                        if (currencyData.connectionState ==
+                            ConnectionState.done) {
                           return FutureBuilder(
                             future: bitcoinService.bitcoinPrice,
-                            builder: (BuildContext context, AsyncSnapshot<dynamic> priceData) {
-                              if (priceData.connectionState == ConnectionState.done) {
-                                if (priceData.hasError || priceData.data == null) {
+                            builder: (BuildContext context,
+                                AsyncSnapshot<dynamic> priceData) {
+                              if (priceData.connectionState ==
+                                  ConnectionState.done) {
+                                if (priceData.hasError ||
+                                    priceData.data == null) {
                                   // Build price load error widget below later
                                   return Text(
                                     'Is your internet connection active?',
@@ -710,11 +724,15 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                                   );
                                 }
 
-                                FlutterMoneyFormatter fmf = FlutterMoneyFormatter(amount: priceData.data + .00);
-                                final String displayPriceNonSymbol = fmf.output.nonSymbol;
+                                FlutterMoneyFormatter fmf =
+                                    FlutterMoneyFormatter(
+                                        amount: priceData.data + .00);
+                                final String displayPriceNonSymbol =
+                                    fmf.output.nonSymbol;
                                 // Triggers code below when no errors are found :D
                                 return Text(
-                                  currencyMap[currencyData.data] + displayPriceNonSymbol,
+                                  currencyMap[currencyData.data] +
+                                      displayPriceNonSymbol,
                                   style: TextStyle(color: Colors.white),
                                   textScaleFactor: 1.5,
                                 );
@@ -764,6 +782,8 @@ AlertDialog showErrorDialog(BuildContext context, String error) {
       error,
       style: TextStyle(color: Colors.white),
     ),
-    actions: [FlatButton(onPressed: () => Navigator.pop(context), child: Text('OK'))],
+    actions: [
+      ElevatedButton(onPressed: () => Navigator.pop(context), child: Text('OK'))
+    ],
   );
 }

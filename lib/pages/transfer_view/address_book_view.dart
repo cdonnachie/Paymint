@@ -9,7 +9,7 @@ class AddressBookView extends StatefulWidget {
 }
 
 class _AddressBookViewState extends State<AddressBookView> {
-  List<String> previousAddresses = new List();
+  List<String> previousAddresses = [];
 
   _populateAddressArray() async {
     final wallet = await Hive.openBox('wallet');
@@ -21,7 +21,9 @@ class _AddressBookViewState extends State<AddressBookView> {
   }
 
   String _displayFormatAddress(String address) {
-    return address.substring(0, 5) + '...' + address.substring(address.length - 7);
+    return address.substring(0, 5) +
+        '...' +
+        address.substring(address.length - 7);
   }
 
   @override
@@ -54,31 +56,43 @@ class _AddressBookViewState extends State<AddressBookView> {
                         if (i == previousAddresses.length) {
                           return ListTile(
                             title: Text(
-                              'Current: ' + _displayFormatAddress(previousAddresses[index]),
+                              'Current: ' +
+                                  _displayFormatAddress(
+                                      previousAddresses[index]),
                               style: TextStyle(color: Colors.white),
                             ),
                             onTap: () {},
                             trailing: IconButton(
-                                icon: Icon(Icons.content_copy, color: Colors.cyanAccent),
+                                icon: Icon(Icons.content_copy,
+                                    color: Colors.cyanAccent),
                                 onPressed: () {
-                                  Clipboard.setData(new ClipboardData(text: previousAddresses[index]));
-                                  Toast.show('Address copied to clipboard', context,
-                                      duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                                  Clipboard.setData(new ClipboardData(
+                                      text: previousAddresses[index]));
+                                  Toast.show(
+                                      'Address copied to clipboard', context,
+                                      duration: Toast.LENGTH_LONG,
+                                      gravity: Toast.BOTTOM);
                                 }),
                           );
                         } else {
                           return ListTile(
                             title: Text(
-                              '$i) ' + _displayFormatAddress(previousAddresses[index]),
+                              '$i) ' +
+                                  _displayFormatAddress(
+                                      previousAddresses[index]),
                               style: TextStyle(color: Colors.white),
                             ),
                             onTap: () {},
                             trailing: IconButton(
-                                icon: Icon(Icons.content_copy, color: Colors.cyanAccent),
+                                icon: Icon(Icons.content_copy,
+                                    color: Colors.cyanAccent),
                                 onPressed: () {
-                                  Clipboard.setData(new ClipboardData(text: previousAddresses[index]));
-                                  Toast.show('Address copied to clipboard', context,
-                                      duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                                  Clipboard.setData(new ClipboardData(
+                                      text: previousAddresses[index]));
+                                  Toast.show(
+                                      'Address copied to clipboard', context,
+                                      duration: Toast.LENGTH_LONG,
+                                      gravity: Toast.BOTTOM);
                                 }),
                           );
                         }
