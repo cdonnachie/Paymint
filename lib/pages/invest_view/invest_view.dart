@@ -1,6 +1,5 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:ravencointlite/services/globals.dart';

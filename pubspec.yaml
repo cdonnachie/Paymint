@@ -23,8 +23,9 @@ dependencies:
   # Utility plugins
   provider: ^5.0.0
   http: ^0.12.0+2
-  majascan: ^0.4.0
-  local_auth: ^0.6.2+3
+  #majascan: ^0.4.0
+  flutter_barcode_scanner: ^1.0.2
+  local_auth: 0.6.3+4
   flutter_inappwebview: ^4.0.0+4
   permission_handler: ^5.1.0+2
   csv: ^4.0.3
@@ -56,7 +57,10 @@ dependencies:
   share: ^0.6.4
   url_launcher: ^5.5.0
   timeago: ^2.0.26
-  flutter_money_formatter: ^0.8.3
+  #flutter_money_formatter: ^0.8.3
+  #money_formatter: ^0.0.2
+  currency_formatter: ^1.1.1
+  intl: ^0.16.1
   cupertino_icons: ^0.1.2
   rounded_loading_button: ^1.0.0
   pinput: ^0.2.5

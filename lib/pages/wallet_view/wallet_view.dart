@@ -4,8 +4,6 @@ import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:ravencointlite/models/models.dart';
 import 'package:marquee/marquee.dart';
 import 'dart:convert';
-import 'package:ravencointlite/services/globals.dart';
-import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
 import 'dark_theme_script.dart' show darkThemeScript;
 

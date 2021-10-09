@@ -1,8 +1,6 @@
 import 'package:bitcoin_flutter/bitcoin_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:flutter_money_formatter/flutter_money_formatter.dart';
-import 'package:majascan/majascan.dart';
 import 'package:ravencointlite/models/models.dart';
 import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:toast/toast.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:currency_formatter/currency_formatter.dart';
 
 class SendView extends StatefulWidget {
   SendView({Key key}) : super(key: key);
@@ -269,16 +268,16 @@ class _SendViewState extends State<SendView> {
       actions: [
         ElevatedButton(
           child: Text('SCAN QR', style: TextStyle(color: Colors.cyanAccent)),
-          onPressed: () async {
-            String scan = await MajaScan.startScan(
-              title: 'Scan QR Code',
-              titleColor: Colors.white,
-              qRCornerColor: Colors.cyanAccent,
-              qRScannerColor: Colors.cyan,
-            );
+          //onPressed: () async {
+          //String scan = await MajaScan.startScan(
+          //  title: 'Scan QR Code',
+          //  titleColor: Colors.white,
+          //  qRCornerColor: Colors.cyanAccent,
+          //  qRScannerColor: Colors.cyan,
+//            );
 
-            recipientAddressTextController.text = scan.trim();
-          },
+          //        recipientAddressTextController.text = scan.trim();
+          //        },
         ),
         ElevatedButton(
           child: Text('CANCEL', style: TextStyle(color: Colors.cyanAccent)),
@@ -364,7 +363,7 @@ class _SendViewState extends State<SendView> {
                                             changeDenominationSelection(
                                                 1, setState),
                                         child: Text(
-                                          'SATS',
+                                          'RVL',
                                           style: TextStyle(
                                             color: buildSelectionColor(1),
                                             fontWeight: buildSelectionWeight(1),
@@ -1200,8 +1199,15 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
     } else if (viewDenomination == 2) {
       final valueRaw = (widget.recipientAmountInSatoshis / 100000000) *
           widget.ravencoinLitePrice;
-      FlutterMoneyFormatter fmf = FlutterMoneyFormatter(amount: valueRaw);
-      return currencyMap[widget.currency] + fmf.output.nonSymbol;
+      CurrencyFormatter cf = new CurrencyFormatter();
+      return currencyMap[widget.currency] +
+          cf.format(
+              valueRaw,
+              new CurrencyFormatterSettings(
+                  symbol: '',
+                  decimalSeparator: ".",
+                  thousandSeparator: ",",
+                  symbolSide: SymbolSide.none));
     }
   }
 
@@ -1213,8 +1219,15 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
     } else if (viewDenomination == 2) {
       final valueRaw =
           (widget.feeInSatoshis / 100000000) * widget.ravencoinLitePrice;
-      FlutterMoneyFormatter fmf = FlutterMoneyFormatter(amount: valueRaw);
-      return currencyMap[widget.currency] + fmf.output.nonSymbol;
+      CurrencyFormatter cf = new CurrencyFormatter();
+      return currencyMap[widget.currency] +
+          cf.format(
+              valueRaw,
+              new CurrencyFormatterSettings(
+                  symbol: '',
+                  decimalSeparator: ".",
+                  thousandSeparator: ",",
+                  symbolSide: SymbolSide.none));
     }
   }
 
