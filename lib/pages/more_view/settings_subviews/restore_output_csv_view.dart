@@ -1,7 +1,7 @@
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:paymint/services/bitcoin_service.dart';
+import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:provider/provider.dart';
 import 'package:hive/hive.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +14,8 @@ class RestoreOutputCsvView extends StatefulWidget {
 }
 
 class _RestoreOutputCsvViewState extends State<RestoreOutputCsvView> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -22,7 +23,8 @@ class _RestoreOutputCsvViewState extends State<RestoreOutputCsvView> {
   }
 
   initFilePicker() async {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
     final String filePath = await FilePicker.getFilePath(
         type: FileType.custom, allowedExtensions: ['csv']);
 
@@ -52,8 +54,8 @@ class _RestoreOutputCsvViewState extends State<RestoreOutputCsvView> {
       final bool blockStatus = outputRow[2].toLowerCase() == 'true';
 
       // Calling provider functions
-      if (blockStatus == true) bitcoinService.blockOutput(txid);
-      bitcoinService.renameOutput(txid, txName);
+      if (blockStatus == true) ravencoinLiteService.blockOutput(txid);
+      ravencoinLiteService.renameOutput(txid, txName);
 
       // Calling hive functions
       final outputNames = await Hive.openBox('labels');
@@ -85,58 +87,59 @@ class _RestoreOutputCsvViewState extends State<RestoreOutputCsvView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Color(0xff121212),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.cyanAccent),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Restore output data from CSV',
-          style: GoogleFonts.rubik(color: Colors.white),
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              'Pick a CSV file from your device that conforms to the CSV format that Paymint exports output data to and it\'ll restore output labels and block status.',
-              style: TextStyle(color: Colors.grey),
+    return ScaffoldMessenger(
+        key: _scaffoldMessengerKey,
+        child: Scaffold(
+          backgroundColor: Color(0xff121212),
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.cyanAccent),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              'Restore output data from CSV',
+              style: GoogleFonts.rubik(color: Colors.white),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              'A restart will be required after data restoration.',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          SizedBox(height: 12),
-          MaterialButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.settings_backup_restore,
-                  color: Color(0xff121212),
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  'Pick a CSV file from your device that conforms to the CSV format that RVLWallet exports output data to and it\'ll restore output labels and block status.',
+                  style: TextStyle(color: Colors.grey),
                 ),
-                SizedBox(width: 12),
-                Text('Restore from CSV',
-                    style: TextStyle(color: Color(0xff121212)))
-              ],
-            ),
-            onPressed: () async => await initFilePicker(),
-            color: Colors.amber,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  'A restart will be required after data restoration.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              SizedBox(height: 12),
+              MaterialButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.settings_backup_restore,
+                      color: Color(0xff121212),
+                    ),
+                    SizedBox(width: 12),
+                    Text('Restore from CSV',
+                        style: TextStyle(color: Color(0xff121212)))
+                  ],
+                ),
+                onPressed: () async => await initFilePicker(),
+                color: Colors.amber,
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }
 

@@ -40,11 +40,11 @@ class _AdvancedViewState extends State<AdvancedView> {
           ),
           ListTile(
             leading: Text(
-              'Esplora Server URL',
+              'API Server URL',
               style: TextStyle(color: Colors.white),
             ),
             trailing: Icon(Icons.chevron_right),
-            onTap: () => Navigator.pushNamed(context, '/esploraview'),
+            onTap: () => Navigator.pushNamed(context, '/apiview'),
           ),
           ListTile(
             leading: Text(

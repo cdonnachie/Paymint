@@ -1,4 +1,4 @@
-package com.paymintlabs.paymint
+package org.ravencoinlite.rvlwallet
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterFragmentActivity

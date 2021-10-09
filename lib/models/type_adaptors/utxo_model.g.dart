@@ -19,7 +19,7 @@ class UtxoDataAdapter extends TypeAdapter<UtxoData> {
     return UtxoData(
       totalUserCurrency: fields[0] as String,
       satoshiBalance: fields[1] as int,
-      bitcoinBalance: fields[2] as dynamic,
+      ravencoinLiteBalance: fields[2] as dynamic,
       unspentOutputArray: (fields[3] as List)?.cast<UtxoObject>(),
     );
   }
@@ -33,7 +33,7 @@ class UtxoDataAdapter extends TypeAdapter<UtxoData> {
       ..writeByte(1)
       ..write(obj.satoshiBalance)
       ..writeByte(2)
-      ..write(obj.bitcoinBalance)
+      ..write(obj.ravencoinLiteBalance)
       ..writeByte(3)
       ..write(obj.unspentOutputArray);
   }

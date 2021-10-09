@@ -64,21 +64,26 @@ class _MoreViewState extends State<MoreView> {
 
                 // If useBiometrics is enabled, then show fingerprint auth screen
                 if (useBiometrics && canCheckBiometrics) {
-                  List<BiometricType> availableSystems = await localAuth.getAvailableBiometrics();
+                  List<BiometricType> availableSystems =
+                      await localAuth.getAvailableBiometrics();
 
                   if (Platform.isIOS) {
                     if (availableSystems.contains(BiometricType.face)) {
                       // Write iOS specific code when required
-                    } else if (availableSystems.contains(BiometricType.fingerprint)) {
+                    } else if (availableSystems
+                        .contains(BiometricType.fingerprint)) {
                       // Write iOS specific code when required
                     }
                   } else if (Platform.isAndroid) {
                     if (availableSystems.contains(BiometricType.fingerprint)) {
-                      bool didAuthenticate = await localAuth.authenticateWithBiometrics(
-                        localizedReason: 'Please authenticate to view secret words',
+                      bool didAuthenticate =
+                          await localAuth.authenticateWithBiometrics(
+                        localizedReason:
+                            'Please authenticate to view secret words',
                       );
 
-                      if (didAuthenticate) Navigator.pushNamed(context, '/backupview');
+                      if (didAuthenticate)
+                        Navigator.pushNamed(context, '/backupview');
                     }
                   }
                 } else {
@@ -104,16 +109,18 @@ class _MoreViewState extends State<MoreView> {
             ),
             ListTile(
               leading: Text(
-                'About Paymint',
+                'About RVLWallet',
                 style: TextStyle(color: Colors.white),
               ),
               trailing: Icon(Icons.info),
               onTap: () {
                 showAboutDialog(
                   context: context,
-                  applicationName: 'Paymint',
-                  applicationIcon: Image.asset('assets/icon/icon.png', height: 40, width: 40),
-                  applicationLegalese: 'All rights reserved © Ready Systems Ltd.\n\nPaymint Labs',
+                  applicationName: 'RVLWallet',
+                  applicationIcon: Image.asset('assets/icon/icon.png',
+                      height: 40, width: 40),
+                  applicationLegalese:
+                      'All rights reserved © Ravencoin Lite Foundation',
                   applicationVersion: '1.2.2',
                 );
               },
@@ -133,13 +140,15 @@ class _MoreViewState extends State<MoreView> {
                           ),
                           SizedBox(width: 16),
                           IconButton(
-                            icon: Image.asset('assets/images/telegram-icon.png'),
+                            icon:
+                                Image.asset('assets/images/telegram-icon.png'),
                             onPressed: () async => _launchTelegram(context),
                           ),
                         ],
                       ),
                       SizedBox(height: 16),
-                      Text('Made with ❤ in Hong Kong', style: TextStyle(color: Colors.white)),
+                      Text('Made with ❤',
+                          style: TextStyle(color: Colors.white)),
                     ],
                   ),
                 ),
@@ -157,7 +166,8 @@ void _launchTwitter(BuildContext context) async {
   if (await canLaunch(url)) {
     await launch(url);
   } else {
-    Toast.show('Cannot launch url', context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    Toast.show('Cannot launch url', context,
+        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
   }
 }
 
@@ -166,7 +176,8 @@ void _launchToS(BuildContext context) async {
   if (await canLaunch(url)) {
     await launch(url);
   } else {
-    Toast.show('Cannot launch url', context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    Toast.show('Cannot launch url', context,
+        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
   }
 }
 
@@ -175,15 +186,17 @@ void _launchPrivacyPolicy(BuildContext context) async {
   if (await canLaunch(url)) {
     await launch(url);
   } else {
-    Toast.show('Cannot launch url', context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    Toast.show('Cannot launch url', context,
+        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
   }
 }
 
 void _launchTelegram(BuildContext context) async {
-  final String url = 'https://t.me/paymintwallet';
+  final String url = 'https://t.me/OfficialRavenCoinLite';
   if (await canLaunch(url)) {
     await launch(url);
   } else {
-    Toast.show('Cannot launch url', context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    Toast.show('Cannot launch url', context,
+        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
   }
 }

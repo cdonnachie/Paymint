@@ -1,11 +1,12 @@
+import 'package:bitcoin_flutter/bitcoin_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:majascan/majascan.dart';
-import 'package:paymint/models/models.dart';
-import 'package:paymint/services/bitcoin_service.dart';
+import 'package:ravencointlite/models/models.dart';
+import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:provider/provider.dart';
-import 'package:paymint/services/globals.dart';
+import 'package:ravencointlite/services/globals.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -20,7 +21,7 @@ class SendView extends StatefulWidget {
 }
 
 class _SendViewState extends State<SendView> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   // Class attributes for recipient address
   String recipientAddress;
@@ -30,13 +31,13 @@ class _SendViewState extends State<SendView> {
 
   // Class atributes for recipient amount
   TextEditingController satsAmountController;
-  TextEditingController btcAmountController;
+  TextEditingController rvlAmountController;
   TextEditingController fiatAmountController;
 
   bool showFinalTxDetails = false;
 
   dynamic satoshiAmount = 0;
-  dynamic btcAmount = 0.0;
+  dynamic rvlAmount = 0.0;
   dynamic fiatAmount = 0.00;
 
   int currentDenominationSelection = 2; // Defaults to fiat
@@ -50,7 +51,7 @@ class _SendViewState extends State<SendView> {
   void initState() {
     satsAmountController =
         TextEditingController(text: satoshiAmount.toString());
-    btcAmountController = TextEditingController(text: btcAmount.toString());
+    rvlAmountController = TextEditingController(text: rvlAmount.toString());
     fiatAmountController = TextEditingController(text: fiatAmount.toString());
 
     super.initState();
@@ -58,25 +59,26 @@ class _SendViewState extends State<SendView> {
 
   @override
   Widget build(BuildContext context) {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
 
     return SafeArea(
       child: Scaffold(
-        key: _scaffoldKey,
+        key: _scaffoldMessengerKey,
         backgroundColor: Color(0xff121212),
         bottomNavigationBar: Container(
           height: 100,
           child: FutureBuilder(
-            future: bitcoinService.fees,
+            future: ravencoinLiteService.fees,
             builder: (BuildContext context, AsyncSnapshot<FeeObject> fees) {
               if (fees.connectionState == ConnectionState.done) {
                 return FutureBuilder(
-                  future: bitcoinService.bitcoinPrice,
+                  future: ravencoinLiteService.ravencoinLitePrice,
                   builder:
                       (BuildContext context, AsyncSnapshot<dynamic> price) {
                     if (price.connectionState == ConnectionState.done) {
                       return FutureBuilder(
-                        future: bitcoinService.currency,
+                        future: ravencoinLiteService.currency,
                         builder: (BuildContext context,
                             AsyncSnapshot<String> currency) {
                           if (currency.connectionState ==
@@ -105,7 +107,7 @@ class _SendViewState extends State<SendView> {
               padding: EdgeInsets.all(12),
               child: Center(
                 child: Text(
-                  'Send Bitcoin',
+                  'Send Ravencoin Lite',
                   textScaleFactor: 1.5,
                   style: TextStyle(color: Colors.white),
                 ),
@@ -114,7 +116,7 @@ class _SendViewState extends State<SendView> {
             SizedBox(height: 12),
             _buildAddRecipientContainer(),
             FutureBuilder(
-              future: bitcoinService.currency,
+              future: ravencoinLiteService.currency,
               builder: (BuildContext context, AsyncSnapshot<String> currency) {
                 if (currency.connectionState == ConnectionState.done) {
                   return _buildSelectAmountToSendContainer(currency.data);
@@ -213,7 +215,7 @@ class _SendViewState extends State<SendView> {
                       children: [
                         SizedBox(width: 8),
                         Image.asset(
-                          'assets/images/btc.png',
+                          'assets/images/rvl.png',
                           height: 35,
                           color: Color(0xff121212),
                         ),
@@ -298,7 +300,8 @@ class _SendViewState extends State<SendView> {
   }
 
   showSelectAmountToSendView() {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
 
     showModalBottomSheet(
       isScrollControlled: true,
@@ -307,7 +310,7 @@ class _SendViewState extends State<SendView> {
         return StatefulBuilder(
           builder: (context, StateSetter setState) {
             return FutureBuilder(
-              future: bitcoinService.bitcoinPrice,
+              future: ravencoinLiteService.ravencoinLitePrice,
               builder: (BuildContext context, AsyncSnapshot<dynamic> price) {
                 if (price.connectionState == ConnectionState.done) {
                   if (price.hasError || price.data == null) {
@@ -315,7 +318,7 @@ class _SendViewState extends State<SendView> {
                       height: 100,
                       child: Center(
                         child: Text(
-                          'Couldn\'t fetch Bitcoin price.\nPlease check connection.',
+                          'Couldn\'t fetch Ravencoin Lite price.\nPlease check connection.',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -323,7 +326,7 @@ class _SendViewState extends State<SendView> {
                   }
 
                   return FutureBuilder(
-                    future: bitcoinService.currency,
+                    future: ravencoinLiteService.currency,
                     builder:
                         (BuildContext context, AsyncSnapshot<String> currency) {
                       if (currency.connectionState == ConnectionState.done) {
@@ -348,7 +351,7 @@ class _SendViewState extends State<SendView> {
                                             changeDenominationSelection(
                                                 0, setState),
                                         child: Text(
-                                          'BTC',
+                                          'RVL',
                                           style: TextStyle(
                                             color: buildSelectionColor(0),
                                             fontWeight: buildSelectionWeight(0),
@@ -427,13 +430,13 @@ class _SendViewState extends State<SendView> {
                                           ),
                                           onTap: () async {
                                             // Check to see that user isnt spending 0 sats, more sats than they have, or an amount equal to that they have spendable in the first place
-                                            final BitcoinService
-                                                bitcoinService =
-                                                Provider.of<BitcoinService>(
-                                                    context);
+                                            final RavencoinLiteService
+                                                ravencoinLiteService = Provider
+                                                    .of<RavencoinLiteService>(
+                                                        context);
 
                                             final List<UtxoObject> allOutputs =
-                                                bitcoinService.allOutputs;
+                                                ravencoinLiteService.allOutputs;
                                             int spendableSatoshiAmount = 0;
 
                                             for (var i = 0;
@@ -459,7 +462,7 @@ class _SendViewState extends State<SendView> {
                                             if (satoshiAmountInt == 0) {
                                               this.setState(() {
                                                 satsAmountController.text = '0';
-                                                btcAmountController.text =
+                                                rvlAmountController.text =
                                                     '0.0';
                                                 fiatAmountController.text =
                                                     '0.00';
@@ -481,7 +484,7 @@ class _SendViewState extends State<SendView> {
                                                     spendableSatoshiAmount) {
                                               this.setState(() {
                                                 satsAmountController.text = '0';
-                                                btcAmountController.text =
+                                                rvlAmountController.text =
                                                     '0.0';
                                                 fiatAmountController.text =
                                                     '0.00';
@@ -502,7 +505,7 @@ class _SendViewState extends State<SendView> {
                                                     spendableSatoshiAmount) {
                                               this.setState(() {
                                                 satsAmountController.text = '0';
-                                                btcAmountController.text =
+                                                rvlAmountController.text =
                                                     '0.0';
                                                 fiatAmountController.text =
                                                     '0.00';
@@ -580,7 +583,7 @@ class _SendViewState extends State<SendView> {
 
   // Functions for amount container
 
-  Widget buildAmountInputBox(String currency, dynamic bitcoinPrice) {
+  Widget buildAmountInputBox(String currency, dynamic ravencoinLitePrice) {
     if (currentDenominationSelection == 0) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -589,17 +592,17 @@ class _SendViewState extends State<SendView> {
           SizedBox(
             width: 200,
             child: TextField(
-              controller: btcAmountController,
+              controller: rvlAmountController,
               keyboardType: TextInputType.number,
               inputFormatters: [NumberRemoveExtraDotFormatter(decimalRange: 8)],
               style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(suffixText: 'BTC'),
-              onChanged: (String btcAmount) {
-                final btcAmountNum = double.parse(btcAmount);
+              decoration: InputDecoration(suffixText: 'RVL'),
+              onChanged: (String rvlAmount) {
+                final rvlAmountNum = double.parse(rvlAmount);
 
-                final satoshiAmount = ((btcAmountNum * 100000000).toInt());
+                final satoshiAmount = ((rvlAmountNum * 100000000).toInt());
                 final fiatAmountString =
-                    (btcAmountNum * bitcoinPrice).toStringAsFixed(2);
+                    (rvlAmountNum * ravencoinLitePrice).toStringAsFixed(2);
 
                 satsAmountController.text = satoshiAmount.toString();
                 fiatAmountController.text = fiatAmountString;
@@ -623,11 +626,11 @@ class _SendViewState extends State<SendView> {
               onChanged: (String satoshiAmount) {
                 final satoshiAmountNum = double.parse(satoshiAmount).toInt();
 
-                final btcAmountNum = satoshiAmountNum / 100000000;
+                final rvlAmountNum = satoshiAmountNum / 100000000;
                 final fiatAmountString =
-                    (btcAmountNum * bitcoinPrice).toStringAsFixed(2);
+                    (rvlAmountNum * ravencoinLitePrice).toStringAsFixed(2);
 
-                btcAmountController.text = btcAmountNum.toString();
+                rvlAmountController.text = rvlAmountNum.toString();
                 fiatAmountController.text = fiatAmountString;
               },
             ),
@@ -651,12 +654,12 @@ class _SendViewState extends State<SendView> {
               onChanged: (String fiatAmount) {
                 final fiatAmountNum = double.parse(fiatAmount);
 
-                final btcAmount =
-                    (fiatAmountNum / bitcoinPrice).toStringAsFixed(8);
+                final rvlAmount =
+                    (fiatAmountNum / ravencoinLitePrice).toStringAsFixed(8);
                 final satoshiAmount =
-                    (double.parse(btcAmount) * 100000000).toInt();
+                    (double.parse(rvlAmount) * 100000000).toInt();
 
-                btcAmountController.text = btcAmount.toString();
+                rvlAmountController.text = rvlAmount.toString();
                 satsAmountController.text = satoshiAmount.toString();
               },
             ),
@@ -668,24 +671,27 @@ class _SendViewState extends State<SendView> {
 
   buildSendAmountText(String currency) {
     if (currentDenominationSelection == 0) {
-      return Text(btcAmountController.text + ' BTC',
+      return Text(rvlAmountController.text + ' RVL',
           style: TextStyle(color: Colors.cyanAccent));
     } else if (currentDenominationSelection == 1) {
       return Text(satsAmountController.text + ' SATS',
           style: TextStyle(color: Colors.cyanAccent));
     } else {
       return Text(
-        currencyMap[currency] + fiatAmountController.text + ' worth of Bitcoin',
+        currencyMap[currency] +
+            fiatAmountController.text +
+            ' worth of Ravencoin Lite',
         style: TextStyle(color: Colors.cyanAccent),
       );
     }
   }
 
   _buildFeeListTile() {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
 
     return FutureBuilder(
-      future: bitcoinService.fees,
+      future: ravencoinLiteService.fees,
       builder: (BuildContext context, AsyncSnapshot<FeeObject> feeObject) {
         if (feeObject.connectionState == ConnectionState.done) {
           if (feeObject == null || feeObject.hasError) {
@@ -714,7 +720,8 @@ class _SendViewState extends State<SendView> {
   }
 
   showFeeSelectionModal() async {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
 
     buildColorForTiles(int index) {
       if (index == feeSelection) {
@@ -730,7 +737,7 @@ class _SendViewState extends State<SendView> {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return FutureBuilder(
-              future: bitcoinService.fees,
+              future: ravencoinLiteService.fees,
               builder: (BuildContext context, AsyncSnapshot<FeeObject> feeObj) {
                 if (feeObj.connectionState == ConnectionState.done) {
                   return Material(
@@ -811,7 +818,7 @@ class _SendViewState extends State<SendView> {
   }
 
   buildPreviewButton(BuildContext context, FeeObject feeObjRaw,
-      dynamic bitcoinPrice, String currency) {
+      dynamic ravencoinLitePrice, String currency) {
     if (showFinalTxDetails) {
       return Center(
         child: ClipRRect(
@@ -821,8 +828,8 @@ class _SendViewState extends State<SendView> {
               decoration: BoxDecoration(color: Colors.amber),
               child: InkWell(
                 onTap: () async {
-                  final BitcoinService bitcoinService =
-                      Provider.of<BitcoinService>(context);
+                  final RavencoinLiteService ravencoinLiteService =
+                      Provider.of<RavencoinLiteService>(context);
                   // Show loading dialog
                   showModal(
                     context: context,
@@ -846,7 +853,8 @@ class _SendViewState extends State<SendView> {
                   final int satoshiAmountToSend =
                       double.parse(satsAmountController.text).toInt();
 
-                  dynamic txHexOrError = await bitcoinService.coinSelection(
+                  dynamic txHexOrError =
+                      await ravencoinLiteService.coinSelection(
                     satoshiAmountToSend,
                     feeChosen,
                     recipientAddressTextController.text,
@@ -882,7 +890,7 @@ class _SendViewState extends State<SendView> {
                         return PreviewTransactionSubview(
                           hex: txHexOrError['hex'],
                           currency: currency,
-                          bitcoinPrice: bitcoinPrice,
+                          ravencoinLitePrice: ravencoinLitePrice,
                           denomination: currentDenominationSelection,
                           feeInSatoshis: txHexOrError['fee'],
                           recipient: txHexOrError['recipient'],
@@ -935,9 +943,15 @@ Text formatAddress(String address) {
 }
 
 String validateAddress(String address) {
-  Pattern pattern = r'^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,59}$';
-  RegExp regex = new RegExp(pattern);
-  if (!regex.hasMatch(address))
+  NetworkType ravencoinLiteNetwork = new NetworkType(
+      messagePrefix: '\x19Raven Signed Message:\n',
+      bip32: new Bip32Type(public: 0x0488b21e, private: 0x0488ade4),
+      bech32: "raven",
+      pubKeyHash: 0x3C,
+      scriptHash: 0x7A,
+      wif: 0x80);
+
+  if (!Address.validateAddress(address, ravencoinLiteNetwork))
     return 'Invalid Address';
   else
     return null;
@@ -965,7 +979,7 @@ AlertDialog exactAmountDialog(BuildContext _) {
   return AlertDialog(
     backgroundColor: Colors.black,
     title: Text(
-      'Not enough bitcoin',
+      'Not enough Ravencoin Lite',
       style: TextStyle(color: Colors.white),
     ),
     content: Text(
@@ -988,7 +1002,7 @@ AlertDialog zeroAmountDialog(BuildContext _) {
   return AlertDialog(
     backgroundColor: Colors.black,
     title: Text(
-      'Not enough bitcoin',
+      'Not enough Ravencoin Lite',
       style: TextStyle(color: Colors.white),
     ),
     content: Text(
@@ -1011,7 +1025,7 @@ AlertDialog tooMuchDialog(BuildContext _) {
   return AlertDialog(
     backgroundColor: Colors.black,
     title: Text(
-      'Not enough bitcoin',
+      'Not enough Ravencoin Lite',
       style: TextStyle(color: Colors.white),
     ),
     content: Text(
@@ -1064,9 +1078,10 @@ AlertDialog notEnoughForFeesDialog(BuildContext _) {
 AlertDialog notEnoughBalanceDialog(BuildContext _) {
   return AlertDialog(
     backgroundColor: Colors.black,
-    title: Text('Not enough Bitcoin', style: TextStyle(color: Colors.white)),
+    title: Text('Not enough Ravencoin Lite',
+        style: TextStyle(color: Colors.white)),
     content: Text(
-      'You don\'t the amount of Bitcoin that you\'re trying to spend. Please modify amount and try again.',
+      'You don\'t the amount of Ravencoin Lite that you\'re trying to spend. Please modify amount and try again.',
       style: TextStyle(color: Colors.white),
     ),
     actions: [
@@ -1122,7 +1137,7 @@ class PreviewTransactionSubview extends StatefulWidget {
   final int recipientAmountInSatoshis;
   final int feeInSatoshis;
   final int denomination;
-  final dynamic bitcoinPrice;
+  final dynamic ravencoinLitePrice;
   final String currency;
 
   const PreviewTransactionSubview(
@@ -1132,7 +1147,7 @@ class PreviewTransactionSubview extends StatefulWidget {
       this.recipientAmountInSatoshis,
       this.feeInSatoshis,
       this.denomination,
-      this.bitcoinPrice,
+      this.ravencoinLitePrice,
       this.currency})
       : super(key: key);
 
@@ -1153,9 +1168,10 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
   }
 
   void pushtx() async {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
     // await Future.delayed(Duration(milliseconds: 2000)).then((value) => submitButtonController.success());
-    await bitcoinService
+    await ravencoinLiteService
         .submitHexToNetwork(widget.hex)
         .then((booleanResponse) async {
       if (booleanResponse == true) {
@@ -1178,12 +1194,12 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
 
   buildAmount() {
     if (viewDenomination == 0) {
-      return (widget.recipientAmountInSatoshis / 100000000).toString() + ' BTC';
+      return (widget.recipientAmountInSatoshis / 100000000).toString() + ' RVL';
     } else if (viewDenomination == 1) {
       return (widget.recipientAmountInSatoshis).toString() + ' sats';
     } else if (viewDenomination == 2) {
-      final valueRaw =
-          (widget.recipientAmountInSatoshis / 100000000) * widget.bitcoinPrice;
+      final valueRaw = (widget.recipientAmountInSatoshis / 100000000) *
+          widget.ravencoinLitePrice;
       FlutterMoneyFormatter fmf = FlutterMoneyFormatter(amount: valueRaw);
       return currencyMap[widget.currency] + fmf.output.nonSymbol;
     }
@@ -1191,11 +1207,12 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
 
   buildFees() {
     if (viewDenomination == 0) {
-      return (widget.feeInSatoshis / 100000000).toString() + ' BTC';
+      return (widget.feeInSatoshis / 100000000).toString() + ' RVL';
     } else if (viewDenomination == 1) {
       return (widget.feeInSatoshis).toString() + ' sats';
     } else if (viewDenomination == 2) {
-      final valueRaw = (widget.feeInSatoshis / 100000000) * widget.bitcoinPrice;
+      final valueRaw =
+          (widget.feeInSatoshis / 100000000) * widget.ravencoinLitePrice;
       FlutterMoneyFormatter fmf = FlutterMoneyFormatter(amount: valueRaw);
       return currencyMap[widget.currency] + fmf.output.nonSymbol;
     }

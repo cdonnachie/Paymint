@@ -12,7 +12,7 @@ export './more_view/settings_subviews/network_view.dart';
 export './more_view/settings_subviews/about_us_view.dart';
 export './more_view/settings_subviews/restore_wallet_view.dart';
 export './more_view/settings_subviews/change_currency_view.dart';
-export './more_view/settings_subviews/esplora_view.dart';
+export 'more_view/settings_subviews/api_view.dart';
 export './more_view/settings_subviews/backup_view.dart';
 export './more_view/settings_subviews/export_output_csv_view.dart';
 export './more_view/settings_subviews/export_tx_csv_view.dart';

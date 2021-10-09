@@ -1,5 +1,5 @@
-name: paymint
-description: Paymint client
+name: ravencointlite
+description: Ravencoint Lite Wallet
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -23,10 +23,10 @@ dependencies:
   # Utility plugins
   provider: ^5.0.0
   http: ^0.12.0+2
-  majascan: ^0.3.7
+  majascan: ^0.4.0
   local_auth: ^0.6.2+3
   flutter_inappwebview: ^4.0.0+4
-  permission_handler: ^5.0.1+1
+  permission_handler: ^5.1.0+2
   csv: ^4.0.3
   file_picker: ^1.13.3
   flutter_web_browser: "^0.12.0"
@@ -35,7 +35,8 @@ dependencies:
   bitcoin_flutter: ^2.0.1
   bip39: ^1.0.3
   bip32: ^1.0.5
-
+  hex: ^0.1.2
+  
   # Storage plugins
   flutter_secure_storage: ^3.3.3
   hive: ^1.4.2
@@ -61,6 +62,7 @@ dependencies:
   pinput: ^0.2.5
   modal_bottom_sheet: 2.0.0
   hive_generator: ^0.8.2
+  flutter_hooks: ^0.15.0
 
 dev_dependencies:
   flutter_test:
@@ -95,7 +97,7 @@ flutter:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
   assets:
-    - assets/images/btc.png
+    - assets/images/rvl.png
     - assets/images/work-in-progress.png
     - assets/images/splash.png
     - assets/images/mastercard.png

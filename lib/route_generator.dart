@@ -26,8 +26,8 @@ class RouteGenerator {
         return CupertinoPageRoute(builder: (_) => RestoreWalletView());
       case '/changecurrency':
         return CupertinoPageRoute(builder: (_) => ChangeCurrencyView());
-      case '/esploraview':
-        return CupertinoPageRoute(builder: (_) => EsploraView());
+      case '/apiview':
+        return CupertinoPageRoute(builder: (_) => APIView());
       case '/backupview':
         return CupertinoPageRoute(builder: (_) => BackupView());
       case '/exportoutput':
@@ -70,7 +70,8 @@ Route<dynamic> _routeError() {
       title: Text('Navigation error'),
     ),
     body: Center(
-      child: Text('Error handling route, this is not supposed to happen. Try restarting the app.'),
+      child: Text(
+          'Error handling route, this is not supposed to happen. Try restarting the app.'),
     ),
   );
 

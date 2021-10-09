@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'pages/pages.dart';
-import 'package:paymint/models/models.dart';
+import 'package:ravencointlite/models/models.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart' as path;
-import 'package:paymint/services/services.dart';
+import 'package:ravencointlite/services/services.dart';
 import 'route_generator.dart';
 import 'package:flutter/services.dart';
 
@@ -34,13 +35,13 @@ void main() async {
 }
 
 /// MyApp initialises relevant services with a MultiProvider
-class MyApp extends StatelessWidget {
+class MyApp extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => BitcoinService(),
+          create: (_) => RavencoinLiteService(),
         )
       ],
       child: MaterialAppWithTheme(),
@@ -79,7 +80,7 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Paymint',
+      title: 'RVLWallet',
       onGenerateRoute: RouteGenerator.generateRoute,
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -112,7 +113,8 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
 }
 
 Widget buildLoadingView() {
-  return Scaffold(
+  return ScaffoldMessenger(
+      child: Scaffold(
     body: Container(
       color: Color(0xff121212),
       child: Center(
@@ -122,5 +124,5 @@ Widget buildLoadingView() {
         ),
       ),
     ),
-  );
+  ));
 }

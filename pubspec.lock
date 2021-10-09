@@ -314,6 +314,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.0"
+  flutter_hooks:
+    dependency: "direct main"
+    description:
+      name: flutter_hooks
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.0"
   flutter_inappwebview:
     dependency: "direct main"
     description:
@@ -402,7 +409,7 @@ packages:
     source: hosted
     version: "0.2.0"
   hex:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: hex
       url: "https://pub.dartlang.org"
@@ -505,7 +512,7 @@ packages:
       name: majascan
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.7"
+    version: "0.4.0"
   marquee:
     dependency: "direct main"
     description:

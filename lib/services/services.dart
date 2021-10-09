@@ -1,2 +1,2 @@
-export './bitcoin_service.dart';
+export 'ravencoinlite_service.dart';
 export './globals.dart';

@@ -3,11 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:sticky_headers/sticky_headers.dart';
-import 'package:paymint/services/services.dart';
-import 'package:paymint/models/models.dart';
-import 'package:paymint/services/globals.dart';
+import 'package:ravencointlite/services/services.dart';
+import 'package:ravencointlite/models/models.dart';
+import 'package:ravencointlite/services/globals.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:paymint/widgets/widgets.dart';
+import 'package:ravencointlite/widgets/widgets.dart';
 import 'package:animations/animations.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
@@ -18,7 +18,8 @@ class TransactionsView extends StatefulWidget {
 
 class _TransactionsViewState extends State<TransactionsView> {
   final GlobalKey<InnerDrawerState> _drawerKey = GlobalKey<InnerDrawerState>();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   void _toggleDrawer() {
     _drawerKey.currentState.toggle();
@@ -26,7 +27,8 @@ class _TransactionsViewState extends State<TransactionsView> {
 
   @override
   Widget build(BuildContext context) {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
 
     return InnerDrawer(
       key: _drawerKey,
@@ -64,7 +66,7 @@ class _TransactionsViewState extends State<TransactionsView> {
           ),
         ),
         body: FutureBuilder(
-          future: bitcoinService.utxoData,
+          future: ravencoinLiteService.utxoData,
           builder: (BuildContext context, AsyncSnapshot<UtxoData> outputData) {
             if (outputData.connectionState == ConnectionState.done) {
               return _buildSecurityView(outputData, context);
@@ -78,14 +80,14 @@ class _TransactionsViewState extends State<TransactionsView> {
       // Transactions View Scaffold
 
       scaffold: Scaffold(
-        key: _scaffoldKey,
+        key: _scaffoldMessengerKey,
         backgroundColor: Color(0xff121212),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.refresh),
           backgroundColor: Color(0xff81D4FA),
           onPressed: () async {
-            final BitcoinService bitcoinService =
-                Provider.of<BitcoinService>(context);
+            final RavencoinLiteService ravencoinLiteService =
+                Provider.of<RavencoinLiteService>(context);
 
             showModal(
               context: context,
@@ -96,7 +98,7 @@ class _TransactionsViewState extends State<TransactionsView> {
               },
             );
 
-            await bitcoinService.refreshWalletData();
+            await ravencoinLiteService.refreshWalletData();
             Navigator.pop(context);
           },
         ),
@@ -117,7 +119,7 @@ class _TransactionsViewState extends State<TransactionsView> {
           ),
         ),
         body: FutureBuilder(
-          future: bitcoinService.transactionData,
+          future: ravencoinLiteService.transactionData,
           builder:
               (BuildContext context, AsyncSnapshot<TransactionData> txData) {
             if (txData.connectionState == ConnectionState.done) {
@@ -185,7 +187,7 @@ Widget _buildActivityView(
 List<Widget> _buildTransactionChildLists(List<Transaction> txChildren) {
   final List<Widget> finalListView = [];
 
-  final satoshisToBtc =
+  final satoshisToRvl =
       (int satoshiAmount) => (satoshiAmount / 100000000).toString();
 
   for (var txIndex = 0; txIndex < txChildren.length; txIndex++) {
@@ -207,7 +209,7 @@ List<Widget> _buildTransactionChildLists(List<Transaction> txChildren) {
       if (txChildren[txIndex].txType == 'Sent') {
         finalListView.add(
           SendListTile(
-            amount: satoshisToBtc(tx.amount),
+            amount: satoshisToRvl(tx.amount),
             currentValue: tx.worthNow,
             previousValue: tx.worthAtBlockTimestamp,
             tx: txChildren[txIndex],
@@ -216,7 +218,7 @@ List<Widget> _buildTransactionChildLists(List<Transaction> txChildren) {
       } else if (txChildren[txIndex].txType == 'Received') {
         finalListView.add(
           ReceiveListTile(
-            amount: satoshisToBtc(tx.amount),
+            amount: satoshisToRvl(tx.amount),
             currentValue: tx.worthNow,
             previousValue: tx.worthAtBlockTimestamp,
             tx: txChildren[txIndex],
@@ -265,7 +267,8 @@ Widget _buildSecurityView(
 }
 
 List<Widget> _buildSecurityListView(BuildContext context) {
-  List<UtxoObject> _utxoList = Provider.of<BitcoinService>(context).allOutputs;
+  List<UtxoObject> _utxoList =
+      Provider.of<RavencoinLiteService>(context).allOutputs;
 
   List<Widget> _finalList = [];
 

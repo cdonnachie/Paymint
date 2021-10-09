@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 import 'package:provider/provider.dart';
 import 'package:bip39/bip39.dart' as bip39;
-import 'package:paymint/services/services.dart';
+import 'package:ravencointlite/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
 class RestoreWalletView extends StatefulWidget {
@@ -31,7 +31,8 @@ class _RestoreWalletViewState extends State<RestoreWalletView> {
                   },
                 );
               } else {
-                final btcService = Provider.of<BitcoinService>(context);
+                final rvlService =
+                    Provider.of<RavencoinLiteService>(context, listen: false);
                 showModal(
                   context: context,
                   configuration: FadeScaleTransitionConfiguration(
@@ -40,9 +41,8 @@ class _RestoreWalletViewState extends State<RestoreWalletView> {
                     return WaitDialog();
                   },
                 );
-                await btcService
-                    .recoverWalletFromBIP32SeedPhrase(textController.text);
-                await btcService.refreshWalletData();
+                await rvlService.recoverWalletFromWIF(textController.text);
+                await rvlService.refreshWalletData();
                 Navigator.pop(context);
                 showModal(
                   context: context,

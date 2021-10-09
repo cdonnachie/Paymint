@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:paymint/services/bitcoin_service.dart';
+import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:provider/provider.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +16,8 @@ class ReceiveView extends StatefulWidget {
 class _ReceiveViewState extends State<ReceiveView> {
   @override
   Widget build(BuildContext context) {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
     bool roundQr = true;
 
     return SafeArea(
@@ -28,14 +29,15 @@ class _ReceiveViewState extends State<ReceiveView> {
             Container(
               padding: EdgeInsets.all(12),
               child: Text(
-                'Receive Bitcoin',
+                'ReceiveRavencoin Lite',
                 textScaleFactor: 1.5,
                 style: TextStyle(color: Colors.white),
               ),
             ),
             FutureBuilder(
-              future: bitcoinService.currentReceivingAddress,
-              builder: (BuildContext context, AsyncSnapshot<String> currentAddress) {
+              future: ravencoinLiteService.currentReceivingAddress,
+              builder:
+                  (BuildContext context, AsyncSnapshot<String> currentAddress) {
                 if (currentAddress.connectionState == ConnectionState.done) {
                   return Expanded(
                     child: Center(
@@ -49,12 +51,14 @@ class _ReceiveViewState extends State<ReceiveView> {
                     ),
                   );
                 } else {
-                  return Container(height: 200, child: Center(child: CircularProgressIndicator()));
+                  return Container(
+                      height: 200,
+                      child: Center(child: CircularProgressIndicator()));
                 }
               },
             ),
             FutureBuilder(
-              future: bitcoinService.currentReceivingAddress,
+              future: ravencoinLiteService.currentReceivingAddress,
               builder: (BuildContext context, AsyncSnapshot<String> address) {
                 if (address.connectionState == ConnectionState.done) {
                   return ListTile(
@@ -74,7 +78,7 @@ class _ReceiveViewState extends State<ReceiveView> {
               },
             ),
             FutureBuilder(
-              future: bitcoinService.currentReceivingAddress,
+              future: ravencoinLiteService.currentReceivingAddress,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return ListTile(
@@ -103,7 +107,7 @@ class _ReceiveViewState extends State<ReceiveView> {
               },
             ),
             FutureBuilder(
-              future: bitcoinService.currentReceivingAddress,
+              future: ravencoinLiteService.currentReceivingAddress,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return ListTile(
@@ -149,5 +153,7 @@ class _ReceiveViewState extends State<ReceiveView> {
 // Receive View helper functions
 
 String condenseAdress(String address) {
-  return address.substring(0, 5) + '...' + address.substring(address.length - 5);
+  return address.substring(0, 8) +
+      '...' +
+      address.substring(address.length - 8);
 }

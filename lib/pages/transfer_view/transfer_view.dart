@@ -45,7 +45,7 @@ class _TransferViewState extends State<TransferView> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Receive Bitcoin',
+                  'Receive Ravencoin Lite',
                   style: TextStyle(color: Color(0xff81D4FA)),
                 ),
                 SizedBox(height: 48),
@@ -75,7 +75,7 @@ class _TransferViewState extends State<TransferView> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Send Bitcoin',
+                  'Send Ravencoin Lite',
                   style: TextStyle(color: Color(0xff81D4FA)),
                 ),
               ],

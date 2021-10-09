@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:paymint/services/services.dart';
+import 'package:ravencointlite/services/services.dart';
 import 'package:animations/animations.dart';
 
 class ChangeCurrencyView extends StatefulWidget {
@@ -29,9 +29,10 @@ class _ChangeCurrencyViewState extends State<ChangeCurrencyView> {
 
   @override
   Widget build(BuildContext context) {
-    final BitcoinService btcService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService rvlService =
+        Provider.of<RavencoinLiteService>(context);
     return FutureBuilder(
-      future: btcService.currency,
+      future: rvlService.currency,
       builder: (BuildContext context, AsyncSnapshot<String> currency) {
         if (currency.connectionState == ConnectionState.done) {
           return _buildChangeCurrencyView(context, currency);
@@ -42,7 +43,8 @@ class _ChangeCurrencyViewState extends State<ChangeCurrencyView> {
     );
   }
 
-  _buildChangeCurrencyView(BuildContext context, AsyncSnapshot<String> currency) {
+  _buildChangeCurrencyView(
+      BuildContext context, AsyncSnapshot<String> currency) {
     return Scaffold(
       body: ListView.builder(
         itemCount: currencyList.length,
@@ -59,7 +61,8 @@ class _ChangeCurrencyViewState extends State<ChangeCurrencyView> {
       return Container(
         color: Color(0xff121212),
         child: ListTile(
-          title: Text(selectedCurrency + ' ~ $symbol', style: TextStyle(color: Colors.white)),
+          title: Text(selectedCurrency + ' ~ $symbol',
+              style: TextStyle(color: Colors.white)),
           trailing: Icon(
             Icons.check,
             color: Colors.cyanAccent,
@@ -72,18 +75,20 @@ class _ChangeCurrencyViewState extends State<ChangeCurrencyView> {
       return Container(
         color: Color(0xff121212),
         child: ListTile(
-          title: Text(currencyList[index] + ' ~ $symbol', style: TextStyle(color: Colors.white)),
+          title: Text(currencyList[index] + ' ~ $symbol',
+              style: TextStyle(color: Colors.white)),
           onTap: () async {
             showModal(
               context: context,
-              configuration: FadeScaleTransitionConfiguration(barrierDismissible: false),
+              configuration:
+                  FadeScaleTransitionConfiguration(barrierDismissible: false),
               builder: (BuildContext context) {
                 return _currencySwitchDialog(currencyList[index]);
               },
             );
-            final BitcoinService btcService = Provider.of<BitcoinService>(context);
-            await btcService.changeCurrency(currencyList[index]);
-            await btcService.refreshWalletData();
+            final RavencoinLiteService rvlService =
+                Provider.of<RavencoinLiteService>(context);
+            await rvlService.refreshWalletData();
             Navigator.pop(context);
           },
         ),

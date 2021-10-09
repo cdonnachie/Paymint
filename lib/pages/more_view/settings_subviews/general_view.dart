@@ -1,6 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:paymint/services/bitcoin_service.dart';
+import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:provider/provider.dart';
 import 'dart:io' show Platform;
 import 'package:local_auth/local_auth.dart';
@@ -13,7 +13,7 @@ class GeneralView extends StatefulWidget {
 class _GeneralViewState extends State<GeneralView> {
   @override
   Widget build(BuildContext context) {
-    final BitcoinService bitcoinService = Provider.of(context);
+    final RavencoinLiteService ravencoinLiteService = Provider.of(context);
 
     return SafeArea(
       child: Scaffold(
@@ -39,7 +39,7 @@ class _GeneralViewState extends State<GeneralView> {
             ),
             SizedBox(height: 16),
             FutureBuilder(
-              future: bitcoinService.currency,
+              future: ravencoinLiteService.currency,
               builder: (BuildContext context, AsyncSnapshot<String> currency) {
                 if (currency.connectionState == ConnectionState.done) {
                   return ListTile(
@@ -70,7 +70,7 @@ class _GeneralViewState extends State<GeneralView> {
               },
             ),
             FutureBuilder(
-              future: bitcoinService.useBiometrics,
+              future: ravencoinLiteService.useBiometrics,
               builder: (BuildContext context, AsyncSnapshot<bool> useBio) {
                 if (useBio.connectionState == ConnectionState.done) {
                   return ListTile(
@@ -85,35 +85,44 @@ class _GeneralViewState extends State<GeneralView> {
                     onTap: () async {
                       // Insert logic to first authenticate biometrics before enabling
                       if (useBio.data) {
-                        await bitcoinService.updateBiometricsUsage();
+                        await ravencoinLiteService.updateBiometricsUsage();
                       } else {
-                        final LocalAuthentication localAuthentication = LocalAuthentication();
+                        final LocalAuthentication localAuthentication =
+                            LocalAuthentication();
 
-                        bool canCheckBiometrics = await localAuthentication.canCheckBiometrics;
+                        bool canCheckBiometrics =
+                            await localAuthentication.canCheckBiometrics;
 
                         if (canCheckBiometrics) {
-                          List<BiometricType> availableSystems = await localAuthentication.getAvailableBiometrics();
+                          List<BiometricType> availableSystems =
+                              await localAuthentication
+                                  .getAvailableBiometrics();
 
                           if (Platform.isIOS) {
                             if (availableSystems.contains(BiometricType.face)) {
                               // Write iOS specific code when required
-                            } else if (availableSystems.contains(BiometricType.fingerprint)) {
+                            } else if (availableSystems
+                                .contains(BiometricType.fingerprint)) {
                               // Write iOS specific code when required
                             }
                           } else if (Platform.isAndroid) {
-                            if (availableSystems.contains(BiometricType.fingerprint)) {
-                              bool didAuthenticate = await localAuthentication.authenticateWithBiometrics(
-                                localizedReason: 'Please authenticate to enable biometric lock',
+                            if (availableSystems
+                                .contains(BiometricType.fingerprint)) {
+                              bool didAuthenticate = await localAuthentication
+                                  .authenticateWithBiometrics(
+                                localizedReason:
+                                    'Please authenticate to enable biometric lock',
                                 stickyAuth: true,
                               );
                               if (didAuthenticate) {
-                                await bitcoinService.updateBiometricsUsage();
+                                await ravencoinLiteService
+                                    .updateBiometricsUsage();
                               }
                             }
                           }
                         }
                       }
-                      // await bitcoinService.updateBiometricsUsage();
+                      // await ravencoinLiteService.updateBiometricsUsage();
                     },
                   );
                 } else {
@@ -131,17 +140,19 @@ class _GeneralViewState extends State<GeneralView> {
               },
             ),
             ListTile(
-              title: Text('Refresh Wallet', style: TextStyle(color: Colors.white)),
+              title:
+                  Text('Refresh Wallet', style: TextStyle(color: Colors.white)),
               trailing: Icon(Icons.refresh, color: Colors.cyanAccent),
               onTap: () async {
                 showModal(
                   context: context,
-                  configuration: FadeScaleTransitionConfiguration(barrierDismissible: false),
+                  configuration: FadeScaleTransitionConfiguration(
+                      barrierDismissible: false),
                   builder: (BuildContext context) {
                     return showLoadingDialog(context);
                   },
                 );
-                await bitcoinService.refreshWalletData();
+                await ravencoinLiteService.refreshWalletData();
                 Navigator.pop(context);
               },
             )

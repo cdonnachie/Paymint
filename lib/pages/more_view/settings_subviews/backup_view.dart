@@ -15,6 +15,13 @@ class _BackupViewState extends State<BackupView> {
     return data;
   }
 
+  _setWIF() async {
+    final secureStore = new FlutterSecureStorage();
+    final mnemonicString = await secureStore.read(key: 'mnemonic');
+    final List<String> data = mnemonicString.split(' ');
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

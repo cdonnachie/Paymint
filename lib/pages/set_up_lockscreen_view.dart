@@ -11,7 +11,8 @@ class SetUpLockscreenView extends StatefulWidget {
 class _SetUpLockscreenViewState extends State<SetUpLockscreenView> {
   PageController _pageController =
       PageController(initialPage: 0, keepPage: true);
-  GlobalKey<ScaffoldState> _globalKey1 = GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldMessengerState> _globalKey1 =
+      GlobalKey<ScaffoldMessengerState>();
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
       border: Border.all(color: Colors.cyanAccent),

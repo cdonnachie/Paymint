@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:paymint/services/bitcoin_service.dart';
+import 'package:ravencointlite/services/ravencoinlite_service.dart';
 import 'package:provider/provider.dart';
 import 'package:animations/animations.dart';
 
@@ -43,7 +43,7 @@ class _BroadcastRawHexViewState extends State<BroadcastRawHexView> {
         child: ListView(
           children: <Widget>[
             Text(
-              'Input the raw transaction hex you wish to broadcast to the Bitcoin network, below.',
+              'Input the raw transaction hex you wish to broadcast to the Ravencoin Lite network, below.',
               style: TextStyle(color: Colors.grey),
             ),
             SizedBox(height: 24),
@@ -75,9 +75,10 @@ class _BroadcastRawHexViewState extends State<BroadcastRawHexView> {
       return 0;
     }
 
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
 
-    final res = await bitcoinService.submitHexToNetwork(hex);
+    final res = await ravencoinLiteService.submitHexToNetwork(hex);
 
     showModal(
       context: context,

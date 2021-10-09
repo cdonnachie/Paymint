@@ -2,13 +2,13 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:paymint/services/bitcoin_service.dart';
-import 'package:paymint/services/globals.dart';
+import 'package:ravencointlite/services/ravencoinlite_service.dart';
+import 'package:ravencointlite/services/globals.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:provider/provider.dart';
-import 'package:paymint/services/utils/currency_utils.dart';
+import 'package:ravencointlite/services/utils/currency_utils.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:paymint/services/services.dart';
+import 'package:ravencointlite/services/services.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -446,7 +446,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
       return Container(
         child: Center(
           child: Text(
-            'We do not support selling Bitcoin for this region yet.\nCome check again soon!',
+            'We do not support selling Ravencoin Lite for this region yet.\nCome check again soon!',
             style: TextStyle(color: Colors.white),
             textAlign: TextAlign.center,
           ),
@@ -468,8 +468,15 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final BitcoinService bitcoinService = Provider.of<BitcoinService>(context);
+    final RavencoinLiteService ravencoinLiteService =
+        Provider.of<RavencoinLiteService>(context);
 
     return InnerDrawer(
       swipeChild: true,
@@ -487,7 +494,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
         builder: (BuildContext context, AsyncSnapshot<String> country) {
           if (country.connectionState == ConnectionState.done) {
             return FutureBuilder(
-              future: bitcoinService.currentReceivingAddress,
+              future: ravencoinLiteService.currentReceivingAddress,
               builder: (BuildContext context, AsyncSnapshot<String> address) {
                 if (address.connectionState == ConnectionState.done) {
                   return SafeArea(
@@ -512,7 +519,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Buy Bitcoin',
+                              'Buy Ravencoin Lite',
                               textScaleFactor: 1.25,
                               style: TextStyle(color: Colors.grey),
                             ),
@@ -526,7 +533,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Sell Bitcoin',
+                              'Sell Ravencoin Lite',
                               textScaleFactor: 1.25,
                               style: TextStyle(color: Colors.grey),
                             ),
@@ -692,7 +699,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                                 ),
                               ),
                               Image.asset(
-                                'assets/images/btc.png',
+                                'assets/images/rvl.png',
                                 height: 70.0,
                                 width: 70.0,
                                 color: Colors.orange,
@@ -704,13 +711,13 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                     ),
                     SizedBox(height: 32),
                     FutureBuilder(
-                      future: bitcoinService.currency,
+                      future: ravencoinLiteService.currency,
                       builder: (BuildContext context,
                           AsyncSnapshot<String> currencyData) {
                         if (currencyData.connectionState ==
                             ConnectionState.done) {
                           return FutureBuilder(
-                            future: bitcoinService.bitcoinPrice,
+                            future: ravencoinLiteService.ravencoinLitePrice,
                             builder: (BuildContext context,
                                 AsyncSnapshot<dynamic> priceData) {
                               if (priceData.connectionState ==
@@ -724,11 +731,9 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                                   );
                                 }
 
-                                FlutterMoneyFormatter fmf =
-                                    FlutterMoneyFormatter(
-                                        amount: priceData.data + .00);
-                                final String displayPriceNonSymbol =
-                                    fmf.output.nonSymbol;
+                                String fmf = priceData.data;
+                                //FlutterMoneyFormatter(amount: priceData.data);
+                                final String displayPriceNonSymbol = fmf;
                                 // Triggers code below when no errors are found :D
                                 return Text(
                                   currencyMap[currencyData.data] +
@@ -750,7 +755,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                       child: Text(
-                        '(Tap on the Bitcoin logo to select your payment method after choosing your country below)',
+                        '(Tap on the Ravencoin Lite logo to select your payment method after choosing your country below)',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
                       ),

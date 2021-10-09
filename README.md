@@ -1,9 +1,9 @@
-# Paymint - A secure bitcoin wallet
-Paymint is a Bitcoin thin client written in Dart with powerful features.
+# RVLWallet - A secure Ravencoin  Lite wallet
+RVLWallet is a Ravencoin Lite thin client written in Dart with powerful features.
 
-[![Playstore](https://bluewallet.io/img/play-store-badge.svg)](https://play.google.com/store/apps/details?id=com.paymintlabs.paymint)
+[![Playstore](https://bluewallet.io/img/play-store-badge.svg)](https://play.google.com/store/apps/details?id=org.ravencoinlite.rvlwallet)
 
-[Join the Telegram Group](https://www.t.me/paymintwallet)
+[Join the Telegram Group](https://t.me/OfficialRavenCoinLite)
 
 ## Feature List
 ✅ Basic fee selection controls
@@ -19,7 +19,7 @@ Paymint is a Bitcoin thin client written in Dart with powerful features.
 ✅ Export transaction data to CSV
 
 ✅ Preview transaction before sending
-- View amount being sent + fee in BTC, sats, or fiat currency
+- View amount being sent + fee in RVL, sats, or fiat currency
 
 ✅ Custom Esplora-Electrs server support
 

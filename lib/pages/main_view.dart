@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import './pages.dart';
 import 'package:flutter/services.dart';
 
@@ -13,7 +12,7 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
   int _currentIndex = 0;
-  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldMessengerState> _key = GlobalKey<ScaffoldMessengerState>();
 
   List<Widget> children = [
     WalletView(),
@@ -29,15 +28,6 @@ class _MainViewState extends State<MainView> {
       return Color(0xff81D4FA);
     } else {
       return Colors.grey;
-    }
-  }
-
-  /// Tab text color based on tab selection
-  TextStyle _buildTextStyle(int index) {
-    if (index == this._currentIndex) {
-      return GoogleFonts.rubik(textStyle: TextStyle(color: Color(0xff81D4FA)));
-    } else {
-      return GoogleFonts.rubik(textStyle: TextStyle(color: Colors.grey));
     }
   }
 
@@ -71,55 +61,40 @@ class _MainViewState extends State<MainView> {
             items: [
               BottomNavigationBarItem(
                 icon: Image.asset(
-                  'assets/images/btc.png',
+                  'assets/images/rvl.png',
                   height: 24.0,
                   width: 24.0,
                   color: _buildIconColor(0), // Index 0
                 ),
-                title: Text(
-                  'Wallet',
-                  style: _buildTextStyle(0), // Index 0
-                ),
+                label: 'Wallet',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.attach_money,
                   color: _buildIconColor(1),
                 ),
-                title: Text(
-                  'Invest',
-                  style: _buildTextStyle(1), // Index 0
-                ),
+                label: 'Invest',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.menu,
                   color: _buildIconColor(2), // Index 1
                 ),
-                title: Text(
-                  'Transactions',
-                  style: _buildTextStyle(2), // Index 1
-                ),
+                label: 'Transactions',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.send,
                   color: _buildIconColor(3), // Index 2
                 ),
-                title: Text(
-                  'Transfer',
-                  style: _buildTextStyle(3), // Index 2
-                ),
+                label: 'Transfer',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.settings,
                   color: _buildIconColor(4), // Index 2
                 ),
-                title: Text(
-                  'Settings',
-                  style: _buildTextStyle(4), // Index 2
-                ),
+                label: 'Settings',
               )
             ],
           ),
