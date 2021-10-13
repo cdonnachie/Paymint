@@ -25,14 +25,15 @@ class _RestoreOutputCsvViewState extends State<RestoreOutputCsvView> {
   initFilePicker() async {
     final RavencoinLiteService ravencoinLiteService =
         Provider.of<RavencoinLiteService>(context);
-    final String filePath = await FilePicker.getFilePath(
-        type: FileType.custom, allowedExtensions: ['csv']);
+    final FilePickerResult result =
+        await FilePicker.platform.pickFiles(allowedExtensions: ['csv']);
+    //type: FileType.custom, allowedExtensions: ['csv']);
 
-    if (filePath == null) return 1;
+    if (result == null) return 1;
 
     final wallet = await Hive.openBox('wallet');
 
-    final String csvFile = await File(filePath).readAsString();
+    final String csvFile = await File(result.files.single.path).readAsString();
     List<List<dynamic>> rowsAsListOfValues =
         CsvToListConverter().convert(csvFile);
     print(rowsAsListOfValues);

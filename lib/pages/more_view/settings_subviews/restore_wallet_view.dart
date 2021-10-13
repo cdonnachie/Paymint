@@ -62,7 +62,7 @@ class _RestoreWalletViewState extends State<RestoreWalletView> {
         child: ListView(
           children: <Widget>[
             Text(
-              'Input your backup\'s secret words (12 words) separated by spaces.',
+              'Input your backup\'s private key.',
               style: TextStyle(color: Colors.grey),
             ),
             SizedBox(height: 24),
@@ -73,7 +73,7 @@ class _RestoreWalletViewState extends State<RestoreWalletView> {
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 filled: true,
-                labelText: 'Secret Words',
+                labelText: 'WIF',
               ),
             )
           ],

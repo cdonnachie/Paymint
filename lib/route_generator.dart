@@ -68,6 +68,7 @@ Route<dynamic> _routeError() {
     appBar: AppBar(
       backgroundColor: Colors.black,
       title: Text('Navigation error'),
+      automaticallyImplyLeading: false,
     ),
     body: Center(
       child: Text(

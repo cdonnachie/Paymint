@@ -76,8 +76,8 @@ class _MoreViewState extends State<MoreView> {
                     }
                   } else if (Platform.isAndroid) {
                     if (availableSystems.contains(BiometricType.fingerprint)) {
-                      bool didAuthenticate =
-                          await localAuth.authenticateWithBiometrics(
+                      bool didAuthenticate = await localAuth.authenticate(
+                        biometricOnly: true,
                         localizedReason:
                             'Please authenticate to view secret words',
                       );

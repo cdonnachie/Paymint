@@ -1,3 +1,4 @@
+import 'package:currency_formatter/currency_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ravencointlite/services/ravencoinlite_service.dart';
@@ -6,6 +7,7 @@ import 'package:marquee/marquee.dart';
 import 'dart:convert';
 import 'package:flutter_echarts/flutter_echarts.dart';
 import 'dark_theme_script.dart' show darkThemeScript;
+import 'package:ravencointlite/services/utils/currency_utils.dart';
 
 class WalletView extends StatefulWidget {
   WalletView({Key key}) : super(key: key);
@@ -88,7 +90,8 @@ class _WalletViewState extends State<WalletView> {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          formatSatoshiBalance(utxoData.data.satoshiBalance),
+                          formatSatoshiBalance(
+                              utxoData.data.ravencoinLiteBalance),
                           textScaleFactor: 1.5,
                           style: TextStyle(color: Colors.white),
                         ),
@@ -131,8 +134,9 @@ class _WalletViewState extends State<WalletView> {
                               if (price.connectionState ==
                                   ConnectionState.done) {
                                 final symbol = currency.data;
-                                final midDate = chartData.data
-                                    .xAxis[chartData.data.xAxis.length - 35];
+                                final midDate = chartData.data.xAxis[
+                                    chartData.data.xAxis.length -
+                                        (chartData.data.xAxis.length ~/ 4)];
 
                                 String fmf = price.data;
                                 //FlutterMoneyFormatter(amount: price.data);
@@ -200,11 +204,16 @@ class _WalletViewState extends State<WalletView> {
 ///
 /// >>> formatSatoshiBalance(123456)
 /// '123,456'
-String formatSatoshiBalance(int satoshiBalance) {
-  RegExp reg = new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-  Function mathFunc = (Match match) => '${match[1]},';
+String formatSatoshiBalance(var satoshiBalance) {
+  final rvlAmount = CurrencyFormatter().format(
+      satoshiBalance,
+      new CurrencyFormatterSettings(
+          symbol: '',
+          decimalSeparator: ".",
+          thousandSeparator: ",",
+          symbolSide: SymbolSide.none));
 
-  return satoshiBalance.toString().replaceAllMapped(reg, mathFunc) + ' sats';
+  return rvlAmount.toString() + ' RVL';
 }
 
 Widget buildBalanceInformationLoadingWidget() {

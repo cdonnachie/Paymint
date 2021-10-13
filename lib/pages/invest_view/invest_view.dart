@@ -11,6 +11,7 @@ import 'package:ravencointlite/services/services.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 class InvestView extends StatefulWidget {
   @override
@@ -66,7 +67,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
       leading: Stack(
         alignment: Alignment.center,
         children: [
-          CircleAvatar(backgroundColor: Colors.greenAccent),
+          CircleAvatar(backgroundColor: Colors.yellowAccent),
           Image.asset(
             'assets/images/card.png',
             height: 22,
@@ -74,7 +75,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
         ],
       ),
       title: Text(
-        'Debit/Credit Card',
+        'Exbitron',
         style: TextStyle(color: Colors.white),
       ),
       subtitle: Text(
@@ -86,32 +87,15 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
         color: Colors.cyanAccent,
       ),
       onTap: () async {
-        final requestBody = {
-          "url":
-              "https://buy.moonpay.io?apiKey=pk_live_uO38X08NU7lveH96y43ZdHrtcyi6J7X&currencyCode=btc&walletAddress=$currentAddress",
-        };
-
         try {
-          final response = await http.post(
-            'https://us-central1-paymint.cloudfunctions.net/api/signPurchaseRequest',
-            body: jsonEncode(requestBody),
-            headers: {'Content-Type': 'application/json'},
-          );
-
-          print(json.decode(response.body));
-
-          if (response.statusCode == 200) {
-            FlutterWebBrowser.openWebPage(
-              url: json.decode(response.body),
-              androidToolbarColor: Color(0xff121212),
-              safariVCOptions: SafariViewControllerOptions(
-                barCollapsingEnabled: true,
-                preferredBarTintColor: Colors.green,
-                preferredControlTintColor: Colors.amber,
-                dismissButtonStyle:
-                    SafariViewControllerDismissButtonStyle.close,
-                modalPresentationCapturesStatusBarAppearance: true,
-              ),
+          if (await canLaunch('https://exbitron.com/trading/rvlusdt')) {
+            await launch('https://exbitron.com/trading/rvlusdt');
+          } else {
+            showModal(
+              context: context,
+              configuration: FadeScaleTransitionConfiguration(),
+              builder: (context) =>
+                  showErrorDialog(context, "Unable to open URL."),
             );
           }
         } catch (e) {
@@ -167,7 +151,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
           if (response.statusCode == 200) {
             FlutterWebBrowser.openWebPage(
               url: json.decode(response.body),
-              androidToolbarColor: Color(0xff121212),
+              //androidToolbarColor: Color(0xff121212),
               safariVCOptions: SafariViewControllerOptions(
                 barCollapsingEnabled: true,
                 preferredBarTintColor: Colors.green,
@@ -306,7 +290,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
           if (response.statusCode == 200) {
             FlutterWebBrowser.openWebPage(
               url: json.decode(response.body),
-              androidToolbarColor: Color(0xff121212),
+              //androidToolbarColor: Color(0xff121212),
               safariVCOptions: SafariViewControllerOptions(
                 barCollapsingEnabled: true,
                 preferredBarTintColor: Colors.green,
@@ -349,6 +333,10 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
       //   return ListView(
       //     children: [bankListTile],
       //   );
+    } else if (country == 'Canada') {
+      return ListView(
+        children: [bankListTile],
+      );
       // } else if (country == 'Czechia (Czech Republic)') {
       //   return ListView(
       //     children: [bankListTile],
@@ -508,7 +496,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                           onPressed: () => Navigator.pop(context),
                         ),
                         title: Text(
-                          'Payment Methods - ' + country.data,
+                          'Exchanges',
                           style: GoogleFonts.rubik(color: Colors.white),
                         ),
                       ),
@@ -518,7 +506,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Buy Ravencoin Lite',
+                              'Buy/Sell Ravencoin Lite',
                               textScaleFactor: 1.25,
                               style: TextStyle(color: Colors.grey),
                             ),
@@ -527,14 +515,6 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                             child: ListView(
                               children: buildListTilesForBuy(
                                   country.data, address.data),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Sell Ravencoin Lite',
-                              textScaleFactor: 1.25,
-                              style: TextStyle(color: Colors.grey),
                             ),
                           ),
                           Expanded(
@@ -565,101 +545,12 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
         },
       ),
 
-      // Country selection view
-      leftChild: SafeArea(
-        child: Scaffold(
-          backgroundColor: Color(0xff121212),
-          body: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  'Please select the country that you bank in:',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              SizedBox(height: 8),
-              TextField(
-                style: TextStyle(color: Colors.white),
-                controller: searchEditingController,
-                decoration: InputDecoration(
-                  labelText: "Search",
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onChanged: (value) => filterSearchResults(value),
-              ),
-              SizedBox(height: 8),
-              Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: countries.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                        countries[index],
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onTap: () async {
-                        setState(() {});
-                        await CurrencyUtilities.setPreferredCurrency(
-                            countries[index]);
-                        FocusScope.of(context).unfocus();
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-
       // Main invest view
       scaffold: SafeArea(
         child: Scaffold(
           backgroundColor: Color(0xff121212),
           bottomNavigationBar: Container(
             height: 100,
-            child: FutureBuilder(
-              future: fetchCountry(),
-              builder: (BuildContext context, AsyncSnapshot<String> country) {
-                if (country.connectionState == ConnectionState.done) {
-                  return Container(
-                    height: 100,
-                    child: Center(
-                      child: ListTile(
-                        title: Text(
-                          'Where do you bank?',
-                          style: TextStyle(color: Colors.grey),
-                          textScaleFactor: 0.75,
-                        ),
-                        subtitle: Text(
-                          country.data,
-                          style: TextStyle(color: Colors.white),
-                          textScaleFactor: 1.25,
-                        ),
-                        trailing: Icon(Icons.list, color: Colors.cyanAccent),
-                        onTap: () => _toggleLeftDrawer(),
-                      ),
-                    ),
-                    // color: Colors.red,
-                  );
-                } else {
-                  return Container(
-                    child: Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width - 16,
-                        child: LinearProgressIndicator(),
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
           ),
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -701,7 +592,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                                 'assets/images/rvl.png',
                                 height: 70.0,
                                 width: 70.0,
-                                color: Colors.orange,
+                                color: Colors.blueAccent,
                               ),
                             ],
                           ),
@@ -754,7 +645,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                       child: Text(
-                        '(Tap on the Ravencoin Lite logo to select your payment method after choosing your country below)',
+                        '(Tap on the Ravencoin Lite logo to select an Exchange)',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
                       ),

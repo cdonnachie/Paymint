@@ -1,5 +1,5 @@
-import 'dart:ffi';
 import 'dart:typed_data';
+import 'package:currency_formatter/currency_formatter.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -21,6 +21,10 @@ class RavencoinLiteService extends ChangeNotifier {
   /// Holds wallet transaction data
   Future<TransactionData> _transactionData;
   Future<TransactionData> get transactionData => _transactionData;
+
+  /// Holds all receiving addresses
+  List<ReceivingAddresses> _receivingAddresses;
+  List<ReceivingAddresses> get receivingAddresses => _receivingAddresses;
 
   // Holds charting information
   Future<ChartModel> _chartData;
@@ -92,7 +96,6 @@ class RavencoinLiteService extends ChangeNotifier {
     // Set relevant indexes
     await wallet.put('receivingIndex', 0);
     await wallet.put('use_biometrics', false);
-    await wallet.put('changeIndex', 0);
     await wallet.put('blocked_tx_hashes', [
       "0xdefault"
     ]); // A list of transaction hashes to represent frozen utxos in wallet
@@ -105,7 +108,8 @@ class RavencoinLiteService extends ChangeNotifier {
         key: 'receivingAddressPubkey', value: HEX.encode(keys.publicKey));
     await secureStore.write(
         key: 'receivingAddressWif', value: HEX.encode(keys.privateKey));
-    await addToAddressesArray(initialReceivingAddress);
+    await addToAddressesArray(initialReceivingAddress,
+        HEX.encode(keys.publicKey), HEX.encode(keys.privateKey));
 
     this._currentReceivingAddress = Future(() => initialReceivingAddress);
     this._useBiomterics = Future(
@@ -149,20 +153,38 @@ class RavencoinLiteService extends ChangeNotifier {
     await wallet.put('receivingIndex', newIndex);
   }
 
-  /// Adds [address] to the relevant chain's address array, which is determined by [chain].
-  /// [address] - Expects a standard native segwit address
-  Future<void> addToAddressesArray(String address) async {
+  /// Adds [address] to the relevant receiving address array.
+  /// [address] - Expects a legacy address
+  Future<void> addToAddressesArray(
+      String address, String publicKey, String privateKey) async {
     final wallet = await Hive.openBox('wallet');
 
     final addressArray = wallet.get('receivingAddresses');
+    final publicKeyArray = wallet.get('receivingPublicKeys');
+    final privateKeyArray = wallet.get('receivingPrivatekeys');
     if (addressArray == null) {
       await wallet.put('receivingAddresses', [address]);
+      await wallet.put('receivingPublicKeys', [publicKey]);
+      await wallet.put('receivingPrivatekeys', [privateKey]);
     } else {
       // Make a deep copy of the exisiting list
-      final newArray = [];
-      addressArray.forEach((_address) => newArray.add(_address));
-      newArray.add(address); // Add the address passed into the method
-      await wallet.put('receivingAddresses', newArray);
+      final newAddressArray = [];
+      addressArray.forEach((_address) => newAddressArray.add(_address));
+      newAddressArray.add(address); // Add the address passed into the method
+      await wallet.put('receivingAddresses', newAddressArray);
+
+      final newPublicKeyArray = [];
+      publicKeyArray.forEach((_publicKey) => newPublicKeyArray.add(_publicKey));
+      newPublicKeyArray
+          .add(publicKey); // Add the address passed into the method
+      await wallet.put('receivingPublicKeys', newPublicKeyArray);
+
+      final newPrivateKeyArray = [];
+      privateKeyArray
+          .forEach((_privateKey) => newPrivateKeyArray.add(_privateKey));
+      newPrivateKeyArray
+          .add(privateKey); // Add the address passed into the method
+      await wallet.put('receivingPrivateKeys', newPrivateKeyArray);
     }
   }
 
@@ -331,7 +353,7 @@ class RavencoinLiteService extends ChangeNotifier {
           final keys = ECPair.makeRandom(network: ravencoinLiteNetwork);
 
           final String newChangeAddress = await generateAddress(keys);
-          await addToAddressesArray(newChangeAddress);
+          await addToAddressesArray(newChangeAddress, "", "");
           recipientsArray.add(newChangeAddress);
           recipientsAmtArray.add(changeOutputSize);
           // At this point, we have the outputs we're going to use, the amounts to send along with which addresses
@@ -546,6 +568,14 @@ class RavencoinLiteService extends ChangeNotifier {
     }
   }
 
+  Future<List<ReceivingAddresses>> _fetchReceivingAddresses() async {
+    final wallet = await Hive.openBox('wallet');
+    final List<ReceivingAddresses> receivingAddresses =
+        await wallet.get('receivingAddresses');
+
+    return receivingAddresses;
+  }
+
   Future<UtxoData> _fetchUtxoData() async {
     final wallet = await Hive.openBox('wallet');
     final List<String> allAddresses = [];
@@ -553,51 +583,158 @@ class RavencoinLiteService extends ChangeNotifier {
     print('currency: ' + currency);
     final List receivingAddresses = await wallet.get('receivingAddresses');
 
-    for (var i = 0; i < receivingAddresses.length; i++) {
-      allAddresses.add(receivingAddresses[i]);
-    }
+    List<String> txHistory = [];
 
-    final Map<String, dynamic> requestBody = {
-      "currency": currency,
-      "allAddresses": allAddresses,
-      "url": await getAPIUrl(),
-    };
+    final ravencoinLitePrice = await getRavencoinLitePrice();
 
     try {
-      final response = await http.post(
-        'https://us-central1-paymint.cloudfunctions.net/api/outputData',
-        body: jsonEncode(requestBody),
-        headers: {'Content-Type': 'application/json'},
-      );
+      for (var i = 0; i < receivingAddresses.length; i++) {
+        int offset = 0;
+        //String url =
+        //    'https://api.ravencoinlite.org/history/' + receivingAddresses[i];
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print('Outputs fetched');
-        final List<UtxoObject> allOutputs =
-            UtxoData.fromJson(json.decode(response.body)).unspentOutputArray;
-        await _sortOutputs(allOutputs);
-        await wallet.put(
-            'latest_utxo_model', UtxoData.fromJson(json.decode(response.body)));
-        notifyListeners();
-        // print(json.decode(response.body));
-        return UtxoData.fromJson(json.decode(response.body));
-      } else {
-        print("Output fetch unsuccessful");
-        final latestTxModel = await wallet.get('latest_utxo_model');
+        String url =
+            'https://api.ravencoinlite.org/history/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm';
 
-        if (latestTxModel == null) {
-          final currency = await CurrencyUtilities.fetchPreferredCurrency();
-          final currencySymbol = currencyMap[currency];
+        final response = await http.get(
+          url + "?offset=" + offset.toString(),
+          headers: {'Content-Type': 'application/json'},
+        );
 
-          final emptyModel = {
-            "total_user_currency": "${currencySymbol}0.00",
-            "total_sats": 0,
-            "total_rvl": 0,
-            "outputArray": []
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          print('History fetched');
+          Map<String, dynamic> map = json.decode(response.body);
+          int txCount = map["result"]["txcount"];
+          if (txCount > 0) {
+            for (String tx in map["result"]["tx"]) {
+              txHistory.add(tx);
+            }
+          }
+          for (offset = 10; offset < txCount; offset += 10) {
+            //for (offset = 10; offset < 20; offset += 10) {
+            final history = await http.get(
+              url + "?offset=" + offset.toString(),
+              headers: {'Content-Type': 'application/json'},
+            );
+            if (history.statusCode == 200 || history.statusCode == 201) {
+              Map<String, dynamic> map = json.decode(history.body);
+              for (String tx in map["result"]["tx"]) {
+                txHistory.add(tx);
+              }
+            }
+          }
+          print("TX Count: " + txCount.toString());
+          print("History Length: " + txHistory.length.toString());
+
+          List<dynamic> outputArray = [];
+          int satoshiBalance = 0;
+          for (String tx in txHistory) {
+            String url = 'https://api.ravencoinlite.org/transaction/' + tx;
+
+            final response = await http.get(
+              url + "?offset=" + offset.toString(),
+              headers: {'Content-Type': 'application/json'},
+            );
+            if (response.statusCode == 200 || response.statusCode == 201) {
+              Map<String, dynamic> itemMap = json.decode(response.body);
+
+              int value = 0;
+              int valueSat = 0;
+              int voutN = 0;
+
+              for (int i = 0; i < itemMap['result']['vout'].length; i++) {
+                for (int j = 0;
+                    j <
+                        itemMap['result']['vout'][i]['scriptPubKey']
+                                ['addresses']
+                            .length;
+                    j++) {
+                  if (itemMap['result']['vout'][i]['scriptPubKey']['addresses']
+                          [j] ==
+                      'RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm') {
+                    value = itemMap['result']['vout'][i]['value'];
+                    valueSat = itemMap['result']['vout'][i]['valueSat'];
+                    voutN = itemMap['result']['vout'][i]['n'];
+                  }
+                }
+              }
+
+              bool confirmed = false;
+              if (itemMap['result']['confirmations'] >= 100) {
+                confirmed = true;
+                satoshiBalance = satoshiBalance + valueSat;
+              }
+
+              final outputRvlValue = value / 100000000;
+              final outputRvlPrice =
+                  double.tryParse(ravencoinLitePrice) * outputRvlValue;
+              Map<String, dynamic> outputMap = {
+                'txid': itemMap['result']['txid'],
+                'vout': voutN,
+                'status': {
+                  'confirmed': confirmed,
+                  'block_height': itemMap['result']['height'],
+                  'block_hash': itemMap['result']['hash'],
+                  'block_time': itemMap['result']['time']
+                },
+                'value': value,
+                'rawWorth': outputRvlPrice,
+                'fiatWorth': CurrencyFormatter().format(
+                    outputRvlPrice,
+                    new CurrencyFormatterSettings(
+                        symbol: '\$',
+                        decimalSeparator: ".",
+                        thousandSeparator: ",",
+                        symbolSide: SymbolSide.left))
+              };
+              outputArray.add(outputMap);
+            }
+          }
+
+          final currencyBalance = CurrencyFormatter().format(
+              double.tryParse(ravencoinLitePrice) *
+                  (satoshiBalance / 100000000),
+              new CurrencyFormatterSettings(
+                  symbol: '\$',
+                  decimalSeparator: ".",
+                  thousandSeparator: ",",
+                  symbolSide: SymbolSide.left));
+
+          Map<String, dynamic> utxoData = {
+            'total_user_currency': currencyBalance,
+            'total_sats': satoshiBalance,
+            'total_rvl': satoshiBalance / 100000000,
+            'outputArray': outputArray
           };
-          return UtxoData.fromJson(emptyModel);
+
+          var outputList = utxoData['outputArray'] as List;
+
+          final List<UtxoObject> allOutputs =
+              UtxoData.fromJson(utxoData).unspentOutputArray;
+          await _sortOutputs(allOutputs);
+          await wallet.put('latest_utxo_model', UtxoData.fromJson(utxoData));
+          notifyListeners();
+          // print(json.decode(response.body));
+          return UtxoData.fromJson(utxoData);
         } else {
-          print("Old output model located");
-          return latestTxModel;
+          print("Output fetch unsuccessful");
+          final latestTxModel = await wallet.get('latest_utxo_model');
+
+          if (latestTxModel == null) {
+            final currency = await CurrencyUtilities.fetchPreferredCurrency();
+            final currencySymbol = currencyMap[currency];
+
+            final emptyModel = {
+              "total_user_currency": "${currencySymbol}0.00",
+              "total_sats": 0,
+              "total_rvl": 0,
+              "outputArray": []
+            };
+            return UtxoData.fromJson(emptyModel);
+          } else {
+            print("Old output model located");
+            return latestTxModel;
+          }
         }
       }
     } catch (e) {
@@ -626,20 +763,19 @@ class RavencoinLiteService extends ChangeNotifier {
     final List<String> allAddresses = [];
     final String currency = await CurrencyUtilities.fetchPreferredCurrency();
     final List receivingAddresses = await wallet.get('receivingAddresses');
-    final List changeAddresses = await wallet.get('changeAddresses');
+    final List changeAddresses = [];
 
     for (var i = 0; i < receivingAddresses.length; i++) {
       allAddresses.add(receivingAddresses[i]);
     }
-    for (var i = 0; i < changeAddresses.length; i++) {
-      allAddresses.add(changeAddresses[i]);
-    }
+
+    allAddresses.add('1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY');
 
     final Map<String, dynamic> requestBody = {
       "currency": currency,
       "allAddresses": allAddresses,
       "changeAddresses": changeAddresses,
-      "url": await getAPIUrl()
+      "url": "https://www.blockstream.info/api" //await getAPIUrl()
     };
 
     try {
@@ -648,6 +784,8 @@ class RavencoinLiteService extends ChangeNotifier {
         body: jsonEncode(requestBody),
         headers: {'Content-Type': 'application/json'},
       );
+
+      print(json.decode(response.body));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Transactions fetched');
@@ -683,13 +821,24 @@ class RavencoinLiteService extends ChangeNotifier {
   }
 
   Future<ChartModel> getChartData() async {
-    final String currency = await CurrencyUtilities.fetchPreferredCurrency();
+    int timeto = new DateTime.now().millisecondsSinceEpoch.abs();
+    timeto = timeto ~/ 1000;
+    int timefrom = new DateTime.now()
+        .subtract(const Duration(days: 90))
+        .millisecondsSinceEpoch
+        .abs();
+    timefrom = timefrom ~/ 1000;
 
-    final Map<String, String> requestBody = {"currency": currency};
+    String url =
+        'https://www.exbitron.com/api/v2/peatio/public/markets/rvlusdt/k-line?period=120&time_from=' +
+            timefrom.toString() +
+            '&time_to=' +
+            timeto.toString();
 
-    final response = await http.post(
-      'https://us-central1-paymint.cloudfunctions.net/api/getChartInfo',
-      body: json.encode(requestBody),
+    print(url);
+
+    final response = await http.get(
+      url,
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -743,8 +892,8 @@ class RavencoinLiteService extends ChangeNotifier {
         final keys = ECPair.makeRandom(network: ravencoinLiteNetwork);
         final newReceivingAddress = await generateAddress(
             keys); // Use new index to derive a new receiving address
-        await addToAddressesArray(
-            newReceivingAddress); // Add that new receiving address to the array of receiving addresses
+        await addToAddressesArray(newReceivingAddress, "",
+            ""); // Add that new receiving address to the array of receiving addresses
         this._currentReceivingAddress = Future(() =>
             newReceivingAddress); // Set the new receiving address that the service
         notifyListeners();

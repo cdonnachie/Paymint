@@ -108,8 +108,9 @@ class _GeneralViewState extends State<GeneralView> {
                           } else if (Platform.isAndroid) {
                             if (availableSystems
                                 .contains(BiometricType.fingerprint)) {
-                              bool didAuthenticate = await localAuthentication
-                                  .authenticateWithBiometrics(
+                              bool didAuthenticate =
+                                  await localAuthentication.authenticate(
+                                biometricOnly: true,
                                 localizedReason:
                                     'Please authenticate to enable biometric lock',
                                 stickyAuth: true,

@@ -44,7 +44,8 @@ class _LockscreenViewState extends State<LockscreenView> {
         }
       } else if (Platform.isAndroid) {
         if (availableSystems.contains(BiometricType.fingerprint)) {
-          bool didAuthenticate = await localAuth.authenticateWithBiometrics(
+          bool didAuthenticate = await localAuth.authenticate(
+            biometricOnly: true,
             localizedReason: 'Please authenticate to unlock wallet',
           );
 
@@ -92,6 +93,7 @@ class _LockscreenViewState extends State<LockscreenView> {
 
                   if (storedPin == pin) {
                     FocusScope.of(context).unfocus();
+                    _pinPutController.clear();
 
                     _globalKey.currentState.hideCurrentSnackBar();
                     _globalKey.currentState.showSnackBar(
@@ -104,7 +106,7 @@ class _LockscreenViewState extends State<LockscreenView> {
                       ),
                     );
                     await Future.delayed(Duration(milliseconds: 600));
-                    Navigator.pushNamed(context, '/mainview');
+                    Navigator.pushReplacementNamed(context, '/mainview');
                   } else {
                     FocusScope.of(context).unfocus();
 

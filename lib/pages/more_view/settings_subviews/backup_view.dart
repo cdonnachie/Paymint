@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 
 class BackupView extends StatefulWidget {
   @override
@@ -8,18 +8,23 @@ class BackupView extends StatefulWidget {
 }
 
 class _BackupViewState extends State<BackupView> {
-  _setMnemonic() async {
-    final secureStore = new FlutterSecureStorage();
-    final mnemonicString = await secureStore.read(key: 'mnemonic');
-    final List<String> data = mnemonicString.split(' ');
-    return data;
-  }
+  _getAddresses() async {
+    final wallet = await Hive.openBox('wallet');
+    final addressArray = wallet.get('receivingAddresses');
+    final publicKeyArray = wallet.get('receivingPublicKeys');
+    final privateKeyArray = wallet.get('receivingPrivatekeys');
 
-  _setWIF() async {
-    final secureStore = new FlutterSecureStorage();
-    final mnemonicString = await secureStore.read(key: 'mnemonic');
-    final List<String> data = mnemonicString.split(' ');
-    return data;
+    final newAddressArray = [];
+    addressArray.forEach((_address) => newAddressArray.add(_address));
+
+    final newPublicKeyArray = [];
+    publicKeyArray.forEach((_publicKey) => newPublicKeyArray.add(_publicKey));
+
+    final newPrivateKeyArray = [];
+    privateKeyArray
+        .forEach((_privateKey) => newPrivateKeyArray.add(_privateKey));
+
+    return addressArray;
   }
 
   @override
@@ -35,7 +40,7 @@ class _BackupViewState extends State<BackupView> {
               ),
               onPressed: () => Navigator.pop(context)),
           title: Text(
-            'Your secret words',
+            'Your private key',
             style: GoogleFonts.rubik(color: Colors.white),
           ),
         ),
@@ -43,14 +48,14 @@ class _BackupViewState extends State<BackupView> {
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Text(
-            'Write these words down on some sort of secure physical medium that you will not eaily lose. They allow you to restore your wallet in case you lose your phone or it\'s memory gets wiped unexpectedly.',
+            'Write this private key down on some sort of secure physical medium that you will not eaily lose. It will allow you to restore your wallet in case you lose your phone or it\'s memory gets wiped unexpectedly.',
             style: TextStyle(color: Colors.grey),
           ),
         ),
         body: Padding(
           padding: EdgeInsets.all(16),
           child: FutureBuilder(
-            future: _setMnemonic(),
+            future: _getAddresses(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return ListView.builder(

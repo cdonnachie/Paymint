@@ -29,7 +29,7 @@ class _ReceiveViewState extends State<ReceiveView> {
             Container(
               padding: EdgeInsets.all(12),
               child: Text(
-                'ReceiveRavencoin Lite',
+                'Receive Ravencoin Lite',
                 textScaleFactor: 1.5,
                 style: TextStyle(color: Colors.white),
               ),
@@ -131,7 +131,7 @@ class _ReceiveViewState extends State<ReceiveView> {
             ),
             ListTile(
               title: Text(
-                'View previous addresses',
+                'View addresses',
                 style: TextStyle(color: Colors.cyanAccent),
               ),
               trailing: Icon(
