@@ -18,6 +18,10 @@ class RavencoinLiteService extends ChangeNotifier {
   Future<UtxoData> _utxoData;
   Future<UtxoData> get utxoData => _utxoData;
 
+  /// Holds final balances, all utxos under control
+  Future<dynamic> _balanceData;
+  Future<dynamic> get balanceData => _balanceData ??= getBalanceData();
+
   /// Holds wallet transaction data
   Future<TransactionData> _transactionData;
   Future<TransactionData> get transactionData => _transactionData;
@@ -568,114 +572,69 @@ class RavencoinLiteService extends ChangeNotifier {
     }
   }
 
-  Future<List<ReceivingAddresses>> _fetchReceivingAddresses() async {
-    final wallet = await Hive.openBox('wallet');
-    final List<ReceivingAddresses> receivingAddresses =
-        await wallet.get('receivingAddresses');
-
-    return receivingAddresses;
-  }
-
   Future<UtxoData> _fetchUtxoData() async {
     final wallet = await Hive.openBox('wallet');
     final List<String> allAddresses = [];
-    final String currency = await CurrencyUtilities.fetchPreferredCurrency();
-    print('currency: ' + currency);
-    final List receivingAddresses = await wallet.get('receivingAddresses');
-
-    List<String> txHistory = [];
+    //final List<ReceivingAddresses> receivingAddresses =
+    //  await wallet.get('receivingAddresses');
 
     final ravencoinLitePrice = await getRavencoinLitePrice();
-
+    int rvlBalance = 0;
     try {
-      for (var i = 0; i < receivingAddresses.length; i++) {
-        int offset = 0;
+      //for (var i = 0; i < receivingAddresses.length; i++) {
+      for (var i = 0; i < 1; i++) {
         //String url =
         //    'https://api.ravencoinlite.org/history/' + receivingAddresses[i];
 
         String url =
-            'https://api.ravencoinlite.org/history/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm';
+            'https://api.ravencoinlite.org/unspent/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm';
 
         final response = await http.get(
-          url + "?offset=" + offset.toString(),
+          url,
           headers: {'Content-Type': 'application/json'},
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
-          print('History fetched');
-          Map<String, dynamic> map = json.decode(response.body);
-          int txCount = map["result"]["txcount"];
-          if (txCount > 0) {
-            for (String tx in map["result"]["tx"]) {
-              txHistory.add(tx);
-            }
-          }
-          for (offset = 10; offset < txCount; offset += 10) {
-            //for (offset = 10; offset < 20; offset += 10) {
-            final history = await http.get(
-              url + "?offset=" + offset.toString(),
-              headers: {'Content-Type': 'application/json'},
-            );
-            if (history.statusCode == 200 || history.statusCode == 201) {
-              Map<String, dynamic> map = json.decode(history.body);
-              for (String tx in map["result"]["tx"]) {
-                txHistory.add(tx);
-              }
-            }
-          }
-          print("TX Count: " + txCount.toString());
-          print("History Length: " + txHistory.length.toString());
-
+          print('Unspent fetched');
+          Map<String, dynamic> unspent = json.decode(response.body);
           List<dynamic> outputArray = [];
-          int satoshiBalance = 0;
-          for (String tx in txHistory) {
-            String url = 'https://api.ravencoinlite.org/transaction/' + tx;
+          var value = 0;
 
-            final response = await http.get(
-              url + "?offset=" + offset.toString(),
+          for (int i = 0; i < unspent['result'].length; i++) {
+            print('Processing record ' +
+                i.toString() +
+                ' of ' +
+                unspent['result'].length.toString());
+            value = unspent['result'][i]['value'];
+            rvlBalance += value;
+
+            String url =
+                "https://api.ravencoinlite.org/range/${unspent['result'][i]['height']}/?offset=1";
+
+            final block = await http.get(
+              url,
               headers: {'Content-Type': 'application/json'},
             );
-            if (response.statusCode == 200 || response.statusCode == 201) {
-              Map<String, dynamic> itemMap = json.decode(response.body);
 
-              int value = 0;
-              int valueSat = 0;
-              int voutN = 0;
-
-              for (int i = 0; i < itemMap['result']['vout'].length; i++) {
-                for (int j = 0;
-                    j <
-                        itemMap['result']['vout'][i]['scriptPubKey']
-                                ['addresses']
-                            .length;
-                    j++) {
-                  if (itemMap['result']['vout'][i]['scriptPubKey']['addresses']
-                          [j] ==
-                      'RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm') {
-                    value = itemMap['result']['vout'][i]['value'];
-                    valueSat = itemMap['result']['vout'][i]['valueSat'];
-                    voutN = itemMap['result']['vout'][i]['n'];
-                  }
-                }
-              }
+            if (block.statusCode == 200 || block.statusCode == 201) {
+              Map<String, dynamic> blockInfo = json.decode(block.body);
 
               bool confirmed = false;
-              if (itemMap['result']['confirmations'] >= 100) {
+              if (blockInfo['result'][0]['confirmations'] > 99) {
                 confirmed = true;
-                satoshiBalance = satoshiBalance + valueSat;
               }
 
               final outputRvlValue = value / 100000000;
               final outputRvlPrice =
                   double.tryParse(ravencoinLitePrice) * outputRvlValue;
               Map<String, dynamic> outputMap = {
-                'txid': itemMap['result']['txid'],
-                'vout': voutN,
+                'txid': unspent['result'][i]['txid'],
+                'vout': unspent['result'][i]['index'],
                 'status': {
                   'confirmed': confirmed,
-                  'block_height': itemMap['result']['height'],
-                  'block_hash': itemMap['result']['hash'],
-                  'block_time': itemMap['result']['time']
+                  'block_height': unspent['result'][i]['height'],
+                  'block_hash': blockInfo['result'][0]['hash'],
+                  'block_time': blockInfo['result'][0]['time']
                 },
                 'value': value,
                 'rawWorth': outputRvlPrice,
@@ -688,12 +647,12 @@ class RavencoinLiteService extends ChangeNotifier {
                         symbolSide: SymbolSide.left))
               };
               outputArray.add(outputMap);
+            } else {
+              throw Exception();
             }
           }
-
           final currencyBalance = CurrencyFormatter().format(
-              double.tryParse(ravencoinLitePrice) *
-                  (satoshiBalance / 100000000),
+              double.tryParse(ravencoinLitePrice) * (rvlBalance / 100000000),
               new CurrencyFormatterSettings(
                   symbol: '\$',
                   decimalSeparator: ".",
@@ -702,12 +661,10 @@ class RavencoinLiteService extends ChangeNotifier {
 
           Map<String, dynamic> utxoData = {
             'total_user_currency': currencyBalance,
-            'total_sats': satoshiBalance,
-            'total_rvl': satoshiBalance / 100000000,
+            'total_sats': rvlBalance,
+            'total_rvl': rvlBalance / 100000000,
             'outputArray': outputArray
           };
-
-          var outputList = utxoData['outputArray'] as List;
 
           final List<UtxoObject> allOutputs =
               UtxoData.fromJson(utxoData).unspentOutputArray;
@@ -830,10 +787,7 @@ class RavencoinLiteService extends ChangeNotifier {
     timefrom = timefrom ~/ 1000;
 
     String url =
-        'https://www.exbitron.com/api/v2/peatio/public/markets/rvlusdt/k-line?period=120&time_from=' +
-            timefrom.toString() +
-            '&time_to=' +
-            timeto.toString();
+        'https://www.exbitron.com/api/v2/peatio/public/markets/rvlusdt/k-line?period=120&time_from=$timefrom&time_to=$timeto';
 
     print(url);
 
@@ -844,6 +798,35 @@ class RavencoinLiteService extends ChangeNotifier {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return ChartModel.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Something happened: ' +
+          response.statusCode.toString() +
+          response.body);
+    }
+  }
+
+  Future<dynamic> getBalanceData() async {
+    final response = await http.get(
+      'https://api.ravencoinlite.org/balance/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm',
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      notifyListeners();
+      Map<String, dynamic> map = jsonDecode(response.body);
+      double rvlBalance = map["result"]["balance"] / 100000000;
+      final dynamic rvlPrice = await getRavencoinLitePrice();
+      final currencyBalance = CurrencyFormatter().format(
+          double.tryParse(rvlPrice) * (rvlBalance),
+          new CurrencyFormatterSettings(
+              symbol: '\$',
+              decimalSeparator: ".",
+              thousandSeparator: ",",
+              symbolSide: SymbolSide.left));
+
+      List<dynamic> balanceData = [rvlBalance, currencyBalance];
+
+      return balanceData;
     } else {
       throw Exception('Something happened: ' +
           response.statusCode.toString() +

@@ -7,7 +7,6 @@ import 'package:marquee/marquee.dart';
 import 'dart:convert';
 import 'package:flutter_echarts/flutter_echarts.dart';
 import 'dark_theme_script.dart' show darkThemeScript;
-import 'package:ravencointlite/services/utils/currency_utils.dart';
 
 class WalletView extends StatefulWidget {
   WalletView({Key key}) : super(key: key);
@@ -65,11 +64,11 @@ class _WalletViewState extends State<WalletView> {
             Container(
               height: (MediaQuery.of(context).size.height - 46) / 3,
               child: FutureBuilder(
-                future: ravencoinLiteService.utxoData,
+                future: ravencoinLiteService.balanceData,
                 builder:
-                    (BuildContext context, AsyncSnapshot<UtxoData> utxoData) {
-                  if (utxoData.connectionState == ConnectionState.done) {
-                    if (utxoData == null || utxoData.hasError) {
+                    (BuildContext context, AsyncSnapshot<dynamic> balanceData) {
+                  if (balanceData.connectionState == ConnectionState.done) {
+                    if (balanceData == null || balanceData.hasError) {
                       return Container(
                         child: Center(
                           child: Text(
@@ -84,14 +83,13 @@ class _WalletViewState extends State<WalletView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          utxoData.data.totalUserCurrency,
+                          balanceData.data[1].toString(),
                           textScaleFactor: 2.7,
                           style: TextStyle(color: Colors.white),
                         ),
                         SizedBox(height: 16),
                         Text(
-                          formatSatoshiBalance(
-                              utxoData.data.ravencoinLiteBalance),
+                          formatSatoshiBalance(balanceData.data[0]),
                           textScaleFactor: 1.5,
                           style: TextStyle(color: Colors.white),
                         ),

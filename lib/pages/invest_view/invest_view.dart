@@ -8,9 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:ravencointlite/services/utils/currency_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ravencointlite/services/services.dart';
-import 'package:flutter_web_browser/flutter_web_browser.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
 class InvestView extends StatefulWidget {
@@ -33,10 +30,6 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
 
   void _toggleRightDrawer() {
     _drawerKey.currentState.toggle(direction: InnerDrawerDirection.end);
-  }
-
-  void _toggleLeftDrawer() {
-    _drawerKey.currentState.toggle(direction: InnerDrawerDirection.start);
   }
 
   void filterSearchResults(String query) {
@@ -62,15 +55,15 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
     }
   }
 
-  buildListTilesForBuy(String country, String currentAddress) {
-    ListTile cardListTile = ListTile(
+  buildListTilesForExbitron() {
+    ListTile exbitronTile = ListTile(
       leading: Stack(
         alignment: Alignment.center,
         children: [
-          CircleAvatar(backgroundColor: Colors.yellowAccent),
+          //CircleAvatar(backgroundColor: Colors.black),
           Image.asset(
-            'assets/images/card.png',
-            height: 22,
+            'assets/images/exbitron.png',
+            height: 44,
           )
         ],
       ),
@@ -78,13 +71,9 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
         'Exbitron',
         style: TextStyle(color: Colors.white),
       ),
-      subtitle: Text(
-        'Low Limits, Instant Delivery',
-        style: TextStyle(color: Colors.grey),
-      ),
       trailing: Icon(
         Icons.chevron_right,
-        color: Colors.cyanAccent,
+        color: Colors.lightBlue[600],
       ),
       onTap: () async {
         try {
@@ -108,197 +97,39 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
       },
     );
 
-    ListTile bankListTile = ListTile(
-      leading: Stack(
-        alignment: Alignment.center,
-        children: [
-          CircleAvatar(backgroundColor: Colors.greenAccent),
-          Image.asset(
-            'assets/images/bank.png',
-            height: 22,
-          )
-        ],
-      ),
-      title: Text(
-        'Bank Transfer',
-        style: TextStyle(color: Colors.white),
-      ),
-      subtitle: Text(
-        'High Limits, Slow Delivery',
-        style: TextStyle(color: Colors.grey),
-      ),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: Colors.cyanAccent,
-      ),
-      onTap: () async {
-        final x = Uri.encodeComponent('sepa_bank_transfer,gbp_bank_transfer');
-
-        final requestBody = {
-          "url":
-              "https://buy.moonpay.io?apiKey=pk_live_uO38X08NU7lveH96y43ZdHrtcyi6J7X&enabledPaymentMethods=$x&currencyCode=btc&walletAddress=$currentAddress",
-        };
-
-        try {
-          final response = await http.post(
-            'https://us-central1-paymint.cloudfunctions.net/api/signPurchaseRequest',
-            body: jsonEncode(requestBody),
-            headers: {'Content-Type': 'application/json'},
-          );
-
-          print(json.decode(response.body));
-
-          if (response.statusCode == 200) {
-            FlutterWebBrowser.openWebPage(
-              url: json.decode(response.body),
-              //androidToolbarColor: Color(0xff121212),
-              safariVCOptions: SafariViewControllerOptions(
-                barCollapsingEnabled: true,
-                preferredBarTintColor: Colors.green,
-                preferredControlTintColor: Colors.amber,
-                dismissButtonStyle:
-                    SafariViewControllerDismissButtonStyle.close,
-                modalPresentationCapturesStatusBarAppearance: true,
-              ),
-            );
-          }
-        } catch (e) {
-          showModal(
-            context: context,
-            configuration: FadeScaleTransitionConfiguration(),
-            builder: (context) => showErrorDialog(context, e.toString()),
-          );
-        }
-      },
-    );
-
-    // Xanpool custom conditions
-    if (country == 'Hong Kong') {
-      return [cardListTile];
-    } else if (country == 'India') {
-      return [cardListTile];
-    } else if (country == 'Philipines') {
-      return [cardListTile];
-    } else if (country == 'Malaysia') {
-      return [cardListTile];
-    } else if (country == 'Singapore') {
-      return [cardListTile];
-    } else if (country == 'Vietnam') {
-      return [cardListTile];
-    } else if (country == 'Indonesia') {
-      return [cardListTile];
-    } else if (country == 'Thailand') {
-      return [cardListTile];
-
-      // EU (BANK for moonpay) custom conditions
-    } else if (country == 'Austria') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Belgium') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Croatia') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Cyprus') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Czechia (Czech Republic)') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Denmark') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Estonia') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Finland') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'France') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Germany') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Greece') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Hungary') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Iceland') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Italy') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Latvia') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Lithuania') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Luxembourg') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Malta') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Netherlands') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Poland') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Portugal') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Romania') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Slovakia') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Slovenia') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Spain') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'Sweden') {
-      return [cardListTile, bankListTile];
-    } else if (country == 'United Kingdom') {
-      return [cardListTile, bankListTile];
-    } else {
-      return [cardListTile];
-    }
+    return [exbitronTile];
   }
 
-  Widget buildListTilesForSell(String country, String currentAddress) {
-    ListTile bankListTile = ListTile(
+  buildListTilesForTradeOgre() {
+    ListTile tradeOgreTile = ListTile(
       leading: Stack(
-        alignment: Alignment.center,
+        alignment: Alignment.topCenter,
         children: [
-          CircleAvatar(backgroundColor: Colors.greenAccent),
+          //CircleAvatar(backgroundColor: Colors.white),
           Image.asset(
-            'assets/images/bank.png',
-            height: 22,
+            'assets/images/tradeogre.png',
+            //height: 512,
           )
         ],
       ),
       title: Text(
-        'Bank Transfer',
+        'Trade Ogre',
         style: TextStyle(color: Colors.white),
-      ),
-      subtitle: Text(
-        'High Limits, Slow Delivery',
-        style: TextStyle(color: Colors.grey),
       ),
       trailing: Icon(
         Icons.chevron_right,
-        color: Colors.cyanAccent,
+        color: Colors.lightBlue[600],
       ),
       onTap: () async {
-        final requestBody = {
-          "url":
-              "https://sell.moonpay.io?apiKey=pk_live_uO38X08NU7lveH96y43ZdHrtcyi6J7X&baseCurrencyCode=btc&refundWalletAddress=$currentAddress",
-        };
-
         try {
-          final response = await http.post(
-            'https://us-central1-paymint.cloudfunctions.net/api/signPurchaseRequest',
-            body: jsonEncode(requestBody),
-            headers: {'Content-Type': 'application/json'},
-          );
-
-          if (response.statusCode == 200) {
-            FlutterWebBrowser.openWebPage(
-              url: json.decode(response.body),
-              //androidToolbarColor: Color(0xff121212),
-              safariVCOptions: SafariViewControllerOptions(
-                barCollapsingEnabled: true,
-                preferredBarTintColor: Colors.green,
-                preferredControlTintColor: Colors.amber,
-                dismissButtonStyle:
-                    SafariViewControllerDismissButtonStyle.close,
-                modalPresentationCapturesStatusBarAppearance: true,
-              ),
+          if (await canLaunch('https://tradeogre.com/exchange/BTC-RVL')) {
+            await launch('https://tradeogre.com/exchange/BTC-RVL');
+          } else {
+            showModal(
+              context: context,
+              configuration: FadeScaleTransitionConfiguration(),
+              builder: (context) =>
+                  showErrorDialog(context, "Unable to open URL."),
             );
           }
         } catch (e) {
@@ -311,135 +142,7 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
       },
     );
 
-    /// Uncomment the countries below when EU sells are enabled by MoonPay
-
-    if (country == 'xxx') {
-      return ListView(
-        children: [bankListTile],
-      );
-      // } else if (country == 'Austria') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Belgium') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Croatia') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Cyprus') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-    } else if (country == 'Canada') {
-      return ListView(
-        children: [bankListTile],
-      );
-      // } else if (country == 'Czechia (Czech Republic)') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Denmark') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Estonia') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Finland') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'France') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Germany') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Greece') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Hungary') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Iceland') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Italy') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Latvia') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Lithuania') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Luxembourg') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Malta') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Netherlands') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Poland') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Portugal') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Romania') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Slovakia') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Slovenia') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Spain') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'Sweden') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-      // } else if (country == 'United Kingdom') {
-      //   return ListView(
-      //     children: [bankListTile],
-      //   );
-    } else {
-      return Container(
-        child: Center(
-          child: Text(
-            'We do not support selling Ravencoin Lite for this region yet.\nCome check again soon!',
-            style: TextStyle(color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+    return [tradeOgreTile];
   }
 
   @override
@@ -473,76 +176,50 @@ class _InvestViewState extends State<InvestView> with TickerProviderStateMixin {
       offset: IDOffset.horizontal(1),
       scale: IDOffset.horizontal(1),
       rightAnimationType: InnerDrawerAnimation.quadratic,
-      colorTransitionChild: Colors.cyan,
+      colorTransitionChild: Colors.lightBlue[600],
 
       // Payment method view
-      rightChild: FutureBuilder(
-        future: fetchCountry(),
-        builder: (BuildContext context, AsyncSnapshot<String> country) {
-          if (country.connectionState == ConnectionState.done) {
-            return FutureBuilder(
-              future: ravencoinLiteService.currentReceivingAddress,
-              builder: (BuildContext context, AsyncSnapshot<String> address) {
-                if (address.connectionState == ConnectionState.done) {
-                  return SafeArea(
-                    child: Scaffold(
-                      backgroundColor: Color(0xff121212),
-                      appBar: AppBar(
-                        leading: IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.cyanAccent,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        title: Text(
-                          'Exchanges',
-                          style: GoogleFonts.rubik(color: Colors.white),
-                        ),
-                      ),
-                      body: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Buy/Sell Ravencoin Lite',
-                              textScaleFactor: 1.25,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView(
-                              children: buildListTilesForBuy(
-                                  country.data, address.data),
-                            ),
-                          ),
-                          Expanded(
-                              child: buildListTilesForSell(
-                                  country.data, address.data)),
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return Container(
-                    color: Color(0xff121212),
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-              },
-            );
-          } else {
-            return Container(
-              color: Color(0xff121212),
-              child: Center(
-                child: CircularProgressIndicator(),
+      rightChild: SafeArea(
+        child: Scaffold(
+          backgroundColor: Color(0xff121212),
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.lightBlue[600],
               ),
-            );
-          }
-        },
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              'Exchanges',
+              style: GoogleFonts.rubik(color: Colors.white),
+            ),
+          ),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Buy/Sell Ravencoin Lite',
+                  textScaleFactor: 1.25,
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  children: buildListTilesForExbitron(),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: ListView(
+                  children: buildListTilesForTradeOgre(),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
 
       // Main invest view

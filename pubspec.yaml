@@ -69,13 +69,10 @@ dependencies:
   flutter_hooks: ^0.18.0
   
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   flutter_launcher_icons: ^0.8.1
-  meta: ^1.7.0
   hive_generator: ^0.8.2
   build_runner: ^1.7.0
-  analyzer: ^0.41.2
+  meta: ^1.6.0
 
 
 flutter_icons:
@@ -107,10 +104,9 @@ flutter:
     - assets/images/work-in-progress.png
     - assets/images/splash.png
     - assets/images/mastercard.png
-    - assets/images/mastercard.jpg
     - assets/images/visa.png
-    - assets/images/bank.png
-    - assets/images/card.png
+    - assets/images/tradeogre.png
+    - assets/images/exbitron.png
     - assets/images/404image.png
     - assets/images/twitter-icon.png
     - assets/images/telegram-icon.png
