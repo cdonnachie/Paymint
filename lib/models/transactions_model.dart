@@ -11,11 +11,11 @@ class TransactionData {
 
   factory TransactionData.fromJson(Map<String, dynamic> json) {
     var dateTimeChunks = json['dateTimeChunks'] as List;
-    List<TransactionChunk> chunksList = dateTimeChunks.map((txChunk) => TransactionChunk.fromJson(txChunk)).toList();
-    
-    return TransactionData(
-      txChunks: chunksList
-    );
+    List<TransactionChunk> chunksList = dateTimeChunks
+        .map((txChunk) => TransactionChunk.fromJson(txChunk))
+        .toList();
+
+    return TransactionData(txChunks: chunksList);
   }
 }
 
@@ -30,12 +30,10 @@ class TransactionChunk {
 
   factory TransactionChunk.fromJson(Map<String, dynamic> json) {
     var txArray = json['transactions'] as List;
-    List<Transaction> txList = txArray.map((tx) => Transaction.fromJson(tx)).toList();
-    
-    return TransactionChunk(
-      timestamp: json['timestamp'],
-      transactions: txList
-    );
+    List<Transaction> txList =
+        txArray.map((tx) => Transaction.fromJson(tx)).toList();
+
+    return TransactionChunk(timestamp: json['timestamp'], transactions: txList);
   }
 }
 
@@ -53,48 +51,57 @@ class Transaction {
   final int amount;
   // @HiveField(5)
   final List aliens;
+
   /// Keep worthNow as dynamic
   // @HiveField(6)
   final dynamic worthNow;
-  /// worthAtBlockTimestamp has to be dynamic in case the server fucks up the price quote and returns null instead of a double
   // @HiveField(7)
-  final dynamic worthAtBlockTimestamp;
-  // @HiveField(8)
   final int fees;
-  // @HiveField(9)
+  // @HiveField(8)
   final int inputSize;
-  // @HiveField(10)
+  // @HiveField(9)
   final int outputSize;
-  // @HiveField(11)
+  // @HiveField(10)
   final List<Input> inputs;
-  // @HiveField(12)
+  // @HiveField(11)
   final List<Output> outputs;
 
-  Transaction({this.txid, this.confirmedStatus, this.timestamp, this.txType, this.amount, this.aliens, this.worthNow, this.worthAtBlockTimestamp,
-  this.fees, this.inputSize, this.outputSize, this.inputs, this.outputs });
+  Transaction(
+      {this.txid,
+      this.confirmedStatus,
+      this.timestamp,
+      this.txType,
+      this.amount,
+      this.aliens,
+      this.worthNow,
+      this.fees,
+      this.inputSize,
+      this.outputSize,
+      this.inputs,
+      this.outputs});
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
     var inputArray = json['inputs'] as List;
     var outputArray = json['outputs'] as List;
 
-    List<Input> inputList = inputArray.map((input) => Input.fromJson(input)).toList();
-    List<Output> outputList = outputArray.map((output) => Output.fromJson(output)).toList();
+    List<Input> inputList =
+        inputArray.map((input) => Input.fromJson(input)).toList();
+    List<Output> outputList =
+        outputArray.map((output) => Output.fromJson(output)).toList();
 
     return Transaction(
-      txid: json['txid'],
-      confirmedStatus: json['confirmed_status'],
-      timestamp: json['timestamp'],
-      txType: json['txType'],
-      amount: json['amount'],
-      aliens: json['aliens'],
-      worthNow: json['worthNow'],
-      worthAtBlockTimestamp: json['worthAtBlockTimestamp'],
-      fees: json['fees'],
-      inputSize: json['inputSize'],
-      outputSize: json['outputSize'],
-      inputs: inputList,
-      outputs: outputList
-    );
+        txid: json['txid'],
+        confirmedStatus: json['confirmed_status'],
+        timestamp: json['timestamp'],
+        txType: json['txType'],
+        amount: json['amount'],
+        aliens: json['aliens'],
+        worthNow: json['worthNow'],
+        fees: json['fees'],
+        inputSize: json['inputSize'],
+        outputSize: json['outputSize'],
+        inputs: inputList,
+        outputs: outputList);
   }
 }
 
@@ -119,22 +126,29 @@ class Input {
   // @HiveField(8)
   final String innerRedeemscriptAsm;
 
-  Input({this.txid, this.vout, this.prevout, this.scriptsig, this.scriptsigAsm, this.witness, this.isCoinbase, this.sequence, this.innerRedeemscriptAsm });
+  Input(
+      {this.txid,
+      this.vout,
+      this.prevout,
+      this.scriptsig,
+      this.scriptsigAsm,
+      this.witness,
+      this.isCoinbase,
+      this.sequence,
+      this.innerRedeemscriptAsm});
 
   factory Input.fromJson(Map<String, dynamic> json) {
     return Input(
-      txid: json['txid'],
-      vout: json['vout'],
-      prevout: Output.fromJson(json['prevout']),
-      scriptsig: json['scriptsig'],
-      scriptsigAsm: json['scriptsig_asm'],
-      witness: json['witness'],
-      isCoinbase: json['is_coinbase'],
-      sequence: json['sequence'],
-      innerRedeemscriptAsm: json['innerRedeemscriptAsm']
-    );
+        txid: json['txid'],
+        vout: json['vout'],
+        prevout: Output.fromJson(json['prevout']),
+        scriptsig: json['scriptsig'],
+        scriptsigAsm: json['scriptsig_asm'],
+        witness: json['witness'],
+        isCoinbase: json['is_coinbase'],
+        sequence: json['sequence'],
+        innerRedeemscriptAsm: json['innerRedeemscriptAsm']);
   }
-
 }
 
 // @HiveType(typeId: 5)
@@ -150,7 +164,12 @@ class Output {
   // @HiveField(4)
   final int value;
 
-  Output({this.scriptpubkey, this.scriptpubkeyAsm, this.scriptpubkeyType, this.scriptpubkeyAddress, this.value});
+  Output(
+      {this.scriptpubkey,
+      this.scriptpubkeyAsm,
+      this.scriptpubkeyType,
+      this.scriptpubkeyAddress,
+      this.value});
 
   factory Output.fromJson(Map<String, dynamic> json) {
     return Output(

@@ -84,7 +84,7 @@ class _ReceiveViewState extends State<ReceiveView> {
                   return ListTile(
                     title: Text(
                       'Copy address to clipboard',
-                      style: TextStyle(color: Colors.cyanAccent),
+                      style: TextStyle(color: Colors.lightBlueAccent.shade700),
                     ),
                     onTap: () {
                       Clipboard.setData(new ClipboardData(text: snapshot.data));
@@ -100,7 +100,7 @@ class _ReceiveViewState extends State<ReceiveView> {
                   return ListTile(
                     title: Text(
                       'Copy address to clipboard',
-                      style: TextStyle(color: Colors.cyanAccent),
+                      style: TextStyle(color: Colors.lightBlueAccent.shade700),
                     ),
                   );
                 }
@@ -113,7 +113,7 @@ class _ReceiveViewState extends State<ReceiveView> {
                   return ListTile(
                     title: Text(
                       'Share address',
-                      style: TextStyle(color: Colors.cyanAccent),
+                      style: TextStyle(color: Colors.lightBlueAccent.shade700),
                     ),
                     onTap: () {
                       Share.share(snapshot.data);
@@ -123,7 +123,7 @@ class _ReceiveViewState extends State<ReceiveView> {
                   return ListTile(
                     title: Text(
                       'Share address',
-                      style: TextStyle(color: Colors.cyanAccent),
+                      style: TextStyle(color: Colors.lightBlueAccent.shade700),
                     ),
                   );
                 }
@@ -132,11 +132,11 @@ class _ReceiveViewState extends State<ReceiveView> {
             ListTile(
               title: Text(
                 'View addresses',
-                style: TextStyle(color: Colors.cyanAccent),
+                style: TextStyle(color: Colors.lightBlueAccent.shade700),
               ),
               trailing: Icon(
                 Icons.chevron_right,
-                color: Colors.cyanAccent,
+                color: Colors.lightBlueAccent.shade700,
               ),
               onTap: () {
                 Navigator.pushNamed(context, '/addressbook');

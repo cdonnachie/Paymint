@@ -49,7 +49,7 @@ class _GeneralViewState extends State<GeneralView> {
                     ),
                     trailing: Text(
                       currency.data,
-                      style: TextStyle(color: Colors.cyanAccent),
+                      style: TextStyle(color: Colors.lightBlueAccent.shade700),
                     ),
                     onTap: () {
                       Navigator.pushNamed(context, '/changecurrency');
@@ -63,7 +63,7 @@ class _GeneralViewState extends State<GeneralView> {
                     ),
                     trailing: Text(
                       'Loading',
-                      style: TextStyle(color: Colors.cyanAccent),
+                      style: TextStyle(color: Colors.lightBlueAccent.shade700),
                     ),
                   );
                 }
@@ -143,7 +143,8 @@ class _GeneralViewState extends State<GeneralView> {
             ListTile(
               title:
                   Text('Refresh Wallet', style: TextStyle(color: Colors.white)),
-              trailing: Icon(Icons.refresh, color: Colors.cyanAccent),
+              trailing:
+                  Icon(Icons.refresh, color: Colors.lightBlueAccent.shade700),
               onTap: () async {
                 showModal(
                   context: context,
@@ -176,7 +177,7 @@ String _buildUseBioText() {
 
 Color buildFingerPrintColor(bool status) {
   if (status == true) {
-    return Colors.cyanAccent;
+    return Colors.lightBlueAccent.shade700;
   } else {
     return Colors.grey;
   }

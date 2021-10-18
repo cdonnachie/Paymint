@@ -52,7 +52,7 @@ class _ActiveOutputTileState extends State<ActiveOutputTile> {
             _currentValue,
             style: TextStyle(color: Colors.white),
           ),
-          leading: Icon(Icons.all_out, color: Colors.cyanAccent),
+          leading: Icon(Icons.all_out, color: Colors.lightBlueAccent.shade700),
           onTap: () {
             Navigator.push(
               context,
@@ -353,7 +353,7 @@ class _UtxoDetailViewState extends State<UtxoDetailView> {
             ),
             ListTile(
               title: Text('Copy Transaction ID',
-                  style: TextStyle(color: Colors.cyanAccent)),
+                  style: TextStyle(color: Colors.lightBlueAccent.shade700)),
               onTap: () {
                 Clipboard.setData(new ClipboardData(text: _utxoObject.txid));
                 Toast.show('ID copied to clipboard', context,
@@ -362,7 +362,7 @@ class _UtxoDetailViewState extends State<UtxoDetailView> {
             ),
             ListTile(
               title: Text('Rename Output',
-                  style: TextStyle(color: Colors.cyanAccent)),
+                  style: TextStyle(color: Colors.lightBlueAccent.shade700)),
               onTap: () {
                 showModal(
                   context: context,
@@ -425,7 +425,7 @@ class _RenameOutputDialog extends StatelessWidget {
         ElevatedButton(
           child: Text(
             'OK',
-            style: TextStyle(color: Colors.cyanAccent),
+            style: TextStyle(color: Colors.lightBlueAccent.shade700),
           ),
           onPressed: () async {
             if (textEditingController.text.isEmpty) {
@@ -443,7 +443,7 @@ class _RenameOutputDialog extends StatelessWidget {
         ElevatedButton(
           child: Text(
             'Cancel',
-            style: TextStyle(color: Colors.cyanAccent),
+            style: TextStyle(color: Colors.lightBlueAccent.shade700),
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -489,9 +489,11 @@ Text buildStatusTileTrailingWidget(bool blockStatus) {
 
 Text buildBlockButtonForOutput(bool blockStatus) {
   if (blockStatus == true) {
-    return Text('Activate output', style: TextStyle(color: Colors.cyanAccent));
+    return Text('Activate output',
+        style: TextStyle(color: Colors.lightBlueAccent.shade700));
   } else {
-    return Text('Block output', style: TextStyle(color: Colors.cyanAccent));
+    return Text('Block output',
+        style: TextStyle(color: Colors.lightBlueAccent.shade700));
   }
 }
 
@@ -579,8 +581,8 @@ class _ReceiveListTileState extends State<ReceiveListTile> {
             context,
             CupertinoPageRoute(
                 builder: (BuildContext _) => _ReceiveDetailsPage(widget.tx))),
-        leading:
-            Icon(Icons.keyboard_arrow_down, color: Colors.cyanAccent, size: 40),
+        leading: Icon(Icons.keyboard_arrow_down,
+            color: Colors.lightBlueAccent.shade700, size: 40),
         title: Text(
           'Received',
           style: TextStyle(color: Colors.white),
@@ -761,17 +763,6 @@ class __SendDetailsPageState extends State<_SendDetailsPage> {
             ),
             ListTile(
               title: Text(
-                'Worth when sent:',
-                style: TextStyle(color: Colors.white),
-              ),
-              trailing: Text(
-                widget._tx.worthAtBlockTimestamp,
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text(
                 'Fee paid:',
                 style: TextStyle(color: Colors.white),
               ),
@@ -791,7 +782,7 @@ class __SendDetailsPageState extends State<_SendDetailsPage> {
             ),
             ListTile(
                 title: Text('Copy transaction ID',
-                    style: TextStyle(color: Colors.cyanAccent)),
+                    style: TextStyle(color: Colors.lightBlueAccent.shade700)),
                 onTap: () {
                   Clipboard.setData(new ClipboardData(text: widget._tx.txid));
                   Toast.show('ID copied to clipboard', context,
@@ -799,7 +790,7 @@ class __SendDetailsPageState extends State<_SendDetailsPage> {
                 }),
             ListTile(
               title: Text('Verify on blockchain',
-                  style: TextStyle(color: Colors.cyanAccent)),
+                  style: TextStyle(color: Colors.lightBlueAccent.shade700)),
               onTap: () {
                 _launchTransactionUrl(context, widget._tx.txid);
               },
@@ -909,13 +900,6 @@ class __ReceiveDetailsPageState extends State<_ReceiveDetailsPage> {
               onTap: () {},
             ),
             ListTile(
-              title: Text('Worth when received:',
-                  style: TextStyle(color: Colors.white)),
-              trailing: Text(widget._tx.worthAtBlockTimestamp,
-                  style: TextStyle(color: Colors.white)),
-              onTap: () {},
-            ),
-            ListTile(
               title: Text('Fee paid:', style: TextStyle(color: Colors.white)),
               trailing:
                   Text(buildFeeAmount(), style: TextStyle(color: Colors.white)),
@@ -932,7 +916,7 @@ class __ReceiveDetailsPageState extends State<_ReceiveDetailsPage> {
             ListTile(
               title: Text(
                 'Copy transaction ID',
-                style: TextStyle(color: Colors.cyanAccent),
+                style: TextStyle(color: Colors.lightBlueAccent.shade700),
               ),
               onTap: () {
                 Clipboard.setData(new ClipboardData(text: widget._tx.txid));
@@ -943,7 +927,7 @@ class __ReceiveDetailsPageState extends State<_ReceiveDetailsPage> {
             ListTile(
               title: Text(
                 'Verify on blockchain',
-                style: TextStyle(color: Colors.cyanAccent),
+                style: TextStyle(color: Colors.lightBlueAccent.shade700),
               ),
               onTap: () {
                 _launchTransactionUrl(context, widget._tx.txid);

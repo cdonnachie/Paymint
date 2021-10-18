@@ -85,8 +85,8 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
       theme: ThemeData(
         brightness: Brightness.dark,
         textTheme: GoogleFonts.rubikTextTheme(),
-        primaryColor: Colors.cyan,
-        //accentColor: Colors.cyanAccent,
+        primaryColor: Colors.blueAccent,
+        //accentColor: Colors.lightBlueAccent.shade700,
         appBarTheme: AppBarTheme(
           centerTitle: true,
           color: Color(0xff121212),

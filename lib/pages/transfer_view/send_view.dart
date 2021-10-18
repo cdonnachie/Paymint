@@ -267,24 +267,27 @@ class _SendViewState extends State<SendView> {
       ),
       actions: [
         ElevatedButton(
-          child: Text('SCAN QR', style: TextStyle(color: Colors.cyanAccent)),
+          child: Text('SCAN QR',
+              style: TextStyle(color: Colors.lightBlueAccent.shade700)),
           //onPressed: () async {
           //String scan = await MajaScan.startScan(
           //  title: 'Scan QR Code',
           //  titleColor: Colors.white,
-          //  qRCornerColor: Colors.cyanAccent,
-          //  qRScannerColor: Colors.cyan,
+          //  qRCornerColor: Colors.lightBlueAccent.shade700,
+          //  qRScannerColor: Colors.lightBlue.shade700,
 //            );
 
           //        recipientAddressTextController.text = scan.trim();
           //        },
         ),
         ElevatedButton(
-          child: Text('CANCEL', style: TextStyle(color: Colors.cyanAccent)),
+          child: Text('CANCEL',
+              style: TextStyle(color: Colors.lightBlueAccent.shade700)),
           onPressed: () => Navigator.pop(context),
         ),
         ElevatedButton(
-          child: Text('OK', style: TextStyle(color: Colors.cyanAccent)),
+          child: Text('OK',
+              style: TextStyle(color: Colors.lightBlueAccent.shade700)),
           onPressed: () {
             if (_formKey.currentState.validate()) {
               setState(() {
@@ -671,16 +674,16 @@ class _SendViewState extends State<SendView> {
   buildSendAmountText(String currency) {
     if (currentDenominationSelection == 0) {
       return Text(rvlAmountController.text + ' RVL',
-          style: TextStyle(color: Colors.cyanAccent));
+          style: TextStyle(color: Colors.lightBlueAccent.shade700));
     } else if (currentDenominationSelection == 1) {
       return Text(satsAmountController.text + ' SATS',
-          style: TextStyle(color: Colors.cyanAccent));
+          style: TextStyle(color: Colors.lightBlueAccent.shade700));
     } else {
       return Text(
         currencyMap[currency] +
             fiatAmountController.text +
             ' worth of Ravencoin Lite',
-        style: TextStyle(color: Colors.cyanAccent),
+        style: TextStyle(color: Colors.lightBlueAccent.shade700),
       );
     }
   }
@@ -697,7 +700,7 @@ class _SendViewState extends State<SendView> {
             return ListTile(
               title: Text(
                 'Could not fetch fee info.\nPlease check connection',
-                style: TextStyle(color: Colors.cyanAccent),
+                style: TextStyle(color: Colors.lightBlueAccent.shade700),
               ),
             );
           }
@@ -706,7 +709,7 @@ class _SendViewState extends State<SendView> {
             title:
                 Text('Fee selection:', style: TextStyle(color: Colors.white)),
             trailing: Text(feeDescription,
-                style: TextStyle(color: Colors.cyanAccent)),
+                style: TextStyle(color: Colors.lightBlueAccent.shade700)),
             onTap: () => showFeeSelectionModal(),
           );
         } else {
@@ -724,7 +727,7 @@ class _SendViewState extends State<SendView> {
 
     buildColorForTiles(int index) {
       if (index == feeSelection) {
-        return Colors.cyanAccent;
+        return Colors.lightBlueAccent.shade700;
       } else {
         return Colors.white;
       }
@@ -937,7 +940,7 @@ Text formatAddress(String address) {
       address.substring(0, 4) + '...' + address.substring(address.length - 4);
   return Text(
     formatted,
-    style: TextStyle(color: Colors.cyanAccent),
+    style: TextStyle(color: Colors.lightBlueAccent.shade700),
   );
 }
 
@@ -990,7 +993,7 @@ AlertDialog exactAmountDialog(BuildContext _) {
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
-          style: TextStyle(color: Colors.cyanAccent),
+          style: TextStyle(color: Colors.lightBlueAccent.shade700),
         ),
       )
     ],
@@ -1013,7 +1016,7 @@ AlertDialog zeroAmountDialog(BuildContext _) {
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
-          style: TextStyle(color: Colors.cyanAccent),
+          style: TextStyle(color: Colors.lightBlueAccent.shade700),
         ),
       )
     ],
@@ -1036,7 +1039,7 @@ AlertDialog tooMuchDialog(BuildContext _) {
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
-          style: TextStyle(color: Colors.cyanAccent),
+          style: TextStyle(color: Colors.lightBlueAccent.shade700),
         ),
       )
     ],
@@ -1277,7 +1280,7 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
               title: Text('Amount:', style: TextStyle(color: Colors.white)),
               trailing: Text(
                 buildAmount(),
-                style: TextStyle(color: Colors.cyanAccent),
+                style: TextStyle(color: Colors.lightBlueAccent.shade700),
               ),
               onTap: () {
                 setState(() {
@@ -1296,7 +1299,7 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
                   style: TextStyle(color: Colors.white)),
               trailing: Text(
                 buildFees(),
-                style: TextStyle(color: Colors.cyanAccent),
+                style: TextStyle(color: Colors.lightBlueAccent.shade700),
               ),
               onTap: () {
                 setState(() {
@@ -1312,7 +1315,7 @@ class _PreviewTransactionSubviewState extends State<PreviewTransactionSubview> {
             ),
             ListTile(
               title: Text('Copy transaction hex',
-                  style: TextStyle(color: Colors.cyanAccent)),
+                  style: TextStyle(color: Colors.lightBlueAccent.shade700)),
               onTap: () {
                 Clipboard.setData(new ClipboardData(text: widget.hex));
                 Toast.show(

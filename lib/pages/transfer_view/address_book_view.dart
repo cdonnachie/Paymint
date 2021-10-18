@@ -64,7 +64,7 @@ class _AddressBookViewState extends State<AddressBookView> {
                             onTap: () {},
                             trailing: IconButton(
                                 icon: Icon(Icons.content_copy,
-                                    color: Colors.cyanAccent),
+                                    color: Colors.lightBlueAccent.shade700),
                                 onPressed: () {
                                   Clipboard.setData(new ClipboardData(
                                       text: previousAddresses[index]));
@@ -85,7 +85,7 @@ class _AddressBookViewState extends State<AddressBookView> {
                             onTap: () {},
                             trailing: IconButton(
                                 icon: Icon(Icons.content_copy,
-                                    color: Colors.cyanAccent),
+                                    color: Colors.lightBlueAccent.shade700),
                                 onPressed: () {
                                   Clipboard.setData(new ClipboardData(
                                       text: previousAddresses[index]));

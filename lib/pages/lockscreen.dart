@@ -15,7 +15,7 @@ class _LockscreenViewState extends State<LockscreenView> {
       GlobalKey<ScaffoldMessengerState>();
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
-      border: Border.all(color: Colors.cyanAccent),
+      border: Border.all(color: Colors.lightBlueAccent.shade700),
       borderRadius: BorderRadius.circular(15.0),
     );
   }
@@ -130,7 +130,8 @@ class _LockscreenViewState extends State<LockscreenView> {
                 selectedFieldDecoration: _pinPutDecoration,
                 followingFieldDecoration: _pinPutDecoration.copyWith(
                   borderRadius: BorderRadius.circular(5.0),
-                  border: Border.all(width: 1.5, color: Colors.cyan),
+                  border:
+                      Border.all(width: 1.5, color: Colors.lightBlue.shade700),
                 ),
               ),
             ),

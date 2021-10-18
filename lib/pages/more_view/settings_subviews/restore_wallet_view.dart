@@ -22,7 +22,8 @@ class _RestoreWalletViewState extends State<RestoreWalletView> {
         child: Center(
           child: CupertinoButton.filled(
             onPressed: () async {
-              if (bip39.validateMnemonic(textController.text.trim()) == false) {
+              //if (bip39.validateMnemonic(textController.text.trim()) == false) {
+              if (1 == 2) {
                 showModal(
                   context: context,
                   configuration: FadeScaleTransitionConfiguration(),
@@ -92,7 +93,7 @@ class InvalidInputDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Invalid input'),
-      content: Text('Please input a valid 12-word mnemonic and try again'),
+      content: Text('Please input a valid WIF and try again'),
       actions: <Widget>[
         ElevatedButton(
           child: Text('OK'),

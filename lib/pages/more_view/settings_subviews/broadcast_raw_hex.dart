@@ -24,7 +24,7 @@ class _BroadcastRawHexViewState extends State<BroadcastRawHexView> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.cyanAccent,
+            color: Colors.lightBlueAccent.shade700,
           ),
           onPressed: () => Navigator.pop(context),
         ),

@@ -65,7 +65,7 @@ class _ChangeCurrencyViewState extends State<ChangeCurrencyView> {
               style: TextStyle(color: Colors.white)),
           trailing: Icon(
             Icons.check,
-            color: Colors.cyanAccent,
+            color: Colors.lightBlueAccent.shade700,
           ),
           onTap: () {},
         ),

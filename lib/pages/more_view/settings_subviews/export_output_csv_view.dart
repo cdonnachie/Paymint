@@ -29,7 +29,8 @@ class _ExportOutputCsvViewState extends State<ExportOutputCsvView> {
           backgroundColor: Color(0xff121212),
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.cyanAccent),
+              icon: Icon(Icons.arrow_back,
+                  color: Colors.lightBlueAccent.shade700),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(

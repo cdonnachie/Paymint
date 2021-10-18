@@ -28,7 +28,8 @@ class _ExportTransactionCsvViewState extends State<ExportTransactionCsvView> {
           backgroundColor: Color(0xff121212),
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.cyanAccent),
+              icon: Icon(Icons.arrow_back,
+                  color: Colors.lightBlueAccent.shade700),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
@@ -106,7 +107,6 @@ class _ExportTransactionCsvViewState extends State<ExportTransactionCsvView> {
         txDataList.add(tx.txType.toString());
         txDataList.add(tx.timestamp.toString());
         txDataList.add(tx.amount.toString());
-        txDataList.add(tx.worthAtBlockTimestamp.toString());
         txDataList.add(tx.worthNow.toString());
         txDataList.add(tx.fees.toString());
         txDataList.add(tx.inputSize.toString());

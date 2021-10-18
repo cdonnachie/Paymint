@@ -36,7 +36,7 @@ class _BackupViewState extends State<BackupView> {
           leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
-                color: Colors.cyanAccent,
+                color: Colors.lightBlueAccent.shade700,
               ),
               onPressed: () => Navigator.pop(context)),
           title: Text(

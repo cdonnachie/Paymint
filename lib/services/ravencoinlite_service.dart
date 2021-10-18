@@ -587,7 +587,7 @@ class RavencoinLiteService extends ChangeNotifier {
         //    'https://api.ravencoinlite.org/history/' + receivingAddresses[i];
 
         String url =
-            'https://api.ravencoinlite.org/unspent/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm';
+            'https://api.ravencoinlite.org/unspent/RUNGkSr8EKH18wU1uD5wopng8EqqyV2iqU';
 
         final response = await http.get(
           url,
@@ -807,7 +807,7 @@ class RavencoinLiteService extends ChangeNotifier {
 
   Future<dynamic> getBalanceData() async {
     final response = await http.get(
-      'https://api.ravencoinlite.org/balance/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm',
+      'https://api.ravencoinlite.org/balance/RUNGkSr8EKH18wU1uD5wopng8EqqyV2iqU',
       headers: {'Content-Type': 'application/json'},
     );
 

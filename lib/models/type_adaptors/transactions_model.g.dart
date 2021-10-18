@@ -95,7 +95,6 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
       amount: fields[4] as int,
       aliens: (fields[5] as List)?.cast<dynamic>(),
       worthNow: fields[6] as dynamic,
-      worthAtBlockTimestamp: fields[7] as dynamic,
       fees: fields[8] as int,
       inputSize: fields[9] as int,
       outputSize: fields[10] as int,
@@ -123,16 +122,14 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
       ..writeByte(6)
       ..write(obj.worthNow)
       ..writeByte(7)
-      ..write(obj.worthAtBlockTimestamp)
-      ..writeByte(8)
       ..write(obj.fees)
-      ..writeByte(9)
+      ..writeByte(8)
       ..write(obj.inputSize)
-      ..writeByte(10)
+      ..writeByte(9)
       ..write(obj.outputSize)
-      ..writeByte(11)
+      ..writeByte(10)
       ..write(obj.inputs)
-      ..writeByte(12)
+      ..writeByte(11)
       ..write(obj.outputs);
   }
 

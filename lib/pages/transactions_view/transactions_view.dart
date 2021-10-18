@@ -38,7 +38,7 @@ class _TransactionsViewState extends State<TransactionsView> {
       offset: IDOffset.horizontal(1),
       scale: IDOffset.horizontal(1),
       rightAnimationType: InnerDrawerAnimation.quadratic,
-      colorTransitionChild: Colors.cyan,
+      colorTransitionChild: Colors.lightBlue.shade700,
 
       // Outputs View Scaffold
 
@@ -211,7 +211,6 @@ List<Widget> _buildTransactionChildLists(List<Transaction> txChildren) {
           SendListTile(
             amount: satoshisToRvl(tx.amount),
             currentValue: tx.worthNow,
-            previousValue: tx.worthAtBlockTimestamp,
             tx: txChildren[txIndex],
           ),
         );
@@ -220,7 +219,6 @@ List<Widget> _buildTransactionChildLists(List<Transaction> txChildren) {
           ReceiveListTile(
             amount: satoshisToRvl(tx.amount),
             currentValue: tx.worthNow,
-            previousValue: tx.worthAtBlockTimestamp,
             tx: txChildren[txIndex],
           ),
         );
