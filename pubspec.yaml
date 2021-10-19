@@ -21,10 +21,11 @@ dependencies:
     sdk: flutter
 
   # Utility plugins
-  provider: ^6.0.1
+  provider: ^4.3.3
   http: ^0.12.0+2
-  #majascan: ^0.4.0
+  majascan: ^0.4.0
   #flutter_barcode_scanner: ^2.0.0
+  #qr_code_scanner: ^0.5.2
   local_auth: ^1.1.8
   flutter_inappwebview: ^5.3.2
   permission_handler: ^5.1.0+2

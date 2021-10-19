@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:currency_formatter/currency_formatter.dart';
 import 'package:flutter/material.dart';
@@ -43,8 +44,8 @@ class RavencoinLiteService extends ChangeNotifier {
   Future<dynamic> get ravencoinLitePrice =>
       _ravencoinLitePrice ??= getRavencoinLitePrice();
 
-  Future<FeeObject> _feeObject;
-  Future<FeeObject> get fees => _feeObject ??= getFees();
+  Future<double> _feeRate;
+  Future<double> get feeRate => _feeRate ??= getFees();
 
   Future<String> _marketInfo;
   Future<String> get marketInfo => _marketInfo ??= getMarketInfo();
@@ -123,24 +124,30 @@ class RavencoinLiteService extends ChangeNotifier {
 
   /// Refreshes display data for the wallet
   refreshWalletData() async {
-    final UtxoData newUtxoData = await _fetchUtxoData();
-    final TransactionData newTxData = await _fetchTransactionData();
-    final dynamic newRvlPrice = await getRavencoinLitePrice();
-    final FeeObject feeObj = await getFees();
-    final String marketInfo = await getMarketInfo();
-    await checkReceivingAddressForTransactions();
+    //await checkReceivingAddressForTransactions();
 
-    this._utxoData = Future(() => newUtxoData);
-    this._transactionData = Future(() => newTxData);
-    this._ravencoinLitePrice = Future(() => newRvlPrice);
-    this._feeObject = Future(() => feeObj);
-    this._marketInfo = Future(() => marketInfo);
+    this._utxoData = Future(() => _fetchUtxoData());
+    this._transactionData = Future(() => _fetchTransactionData());
+    this._ravencoinLitePrice = Future(() => getRavencoinLitePrice());
+    this._feeRate = Future(() => getFees());
+    this._marketInfo = Future(() => getMarketInfo());
     notifyListeners();
+  }
+
+  Future<bool> validateAddress(String address) async {
+    NetworkType ravencoinLiteNetwork = new NetworkType(
+        messagePrefix: '\x19Raven Signed Message:\n',
+        bip32: new Bip32Type(public: 0x0488b21e, private: 0x0488ade4),
+        bech32: "raven",
+        pubKeyHash: 0x3C,
+        scriptHash: 0x7A,
+        wif: 0x80);
+
+    return Address.validateAddress(address, ravencoinLiteNetwork);
   }
 
   /// Generates a new internal or external chain address for the wallet using a BIP84 derivation path.
   /// [keys] - Random generated keys from network
-  /// [chain] - Use 0 for receiving (external), 1 for change (internal). Should not be any other value!
   Future<String> generateAddress(ECPair keys) async {
     return P2PKH(
             data: new PaymentData(pubkey: keys.publicKey),
@@ -582,12 +589,13 @@ class RavencoinLiteService extends ChangeNotifier {
     int rvlBalance = 0;
     try {
       //for (var i = 0; i < receivingAddresses.length; i++) {
+      List<dynamic> outputArray = [];
       for (var i = 0; i < 1; i++) {
         //String url =
         //    'https://api.ravencoinlite.org/history/' + receivingAddresses[i];
 
         String url =
-            'https://api.ravencoinlite.org/unspent/RUNGkSr8EKH18wU1uD5wopng8EqqyV2iqU';
+            'https://api.ravencoinlite.org/unspent/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm';
 
         final response = await http.get(
           url,
@@ -597,7 +605,6 @@ class RavencoinLiteService extends ChangeNotifier {
         if (response.statusCode == 200 || response.statusCode == 201) {
           print('Unspent fetched');
           Map<String, dynamic> unspent = json.decode(response.body);
-          List<dynamic> outputArray = [];
           var value = 0;
 
           for (int i = 0; i < unspent['result'].length; i++) {
@@ -651,28 +658,6 @@ class RavencoinLiteService extends ChangeNotifier {
               throw Exception();
             }
           }
-          final currencyBalance = CurrencyFormatter().format(
-              double.tryParse(ravencoinLitePrice) * (rvlBalance / 100000000),
-              new CurrencyFormatterSettings(
-                  symbol: '\$',
-                  decimalSeparator: ".",
-                  thousandSeparator: ",",
-                  symbolSide: SymbolSide.left));
-
-          Map<String, dynamic> utxoData = {
-            'total_user_currency': currencyBalance,
-            'total_sats': rvlBalance,
-            'total_rvl': rvlBalance / 100000000,
-            'outputArray': outputArray
-          };
-
-          final List<UtxoObject> allOutputs =
-              UtxoData.fromJson(utxoData).unspentOutputArray;
-          await _sortOutputs(allOutputs);
-          await wallet.put('latest_utxo_model', UtxoData.fromJson(utxoData));
-          notifyListeners();
-          // print(json.decode(response.body));
-          return UtxoData.fromJson(utxoData);
         } else {
           print("Output fetch unsuccessful");
           final latestTxModel = await wallet.get('latest_utxo_model');
@@ -694,6 +679,28 @@ class RavencoinLiteService extends ChangeNotifier {
           }
         }
       }
+      final currencyBalance = CurrencyFormatter().format(
+          double.tryParse(ravencoinLitePrice) * (rvlBalance / 100000000),
+          new CurrencyFormatterSettings(
+              symbol: '\$',
+              decimalSeparator: ".",
+              thousandSeparator: ",",
+              symbolSide: SymbolSide.left));
+
+      Map<String, dynamic> utxoData = {
+        'total_user_currency': currencyBalance,
+        'total_sats': rvlBalance,
+        'total_rvl': rvlBalance / 100000000,
+        'outputArray': outputArray
+      };
+
+      final List<UtxoObject> allOutputs =
+          UtxoData.fromJson(utxoData).unspentOutputArray;
+      await _sortOutputs(allOutputs);
+      await wallet.put('latest_utxo_model', UtxoData.fromJson(utxoData));
+      notifyListeners();
+      // print(json.decode(response.body));
+      return UtxoData.fromJson(utxoData);
     } catch (e) {
       print("Output fetch unsuccessful");
       final latestTxModel = await wallet.get('latest_utxo_model');
@@ -807,7 +814,7 @@ class RavencoinLiteService extends ChangeNotifier {
 
   Future<dynamic> getBalanceData() async {
     final response = await http.get(
-      'https://api.ravencoinlite.org/balance/RUNGkSr8EKH18wU1uD5wopng8EqqyV2iqU',
+      'https://api.ravencoinlite.org/balance/RXt29uFKBr8RnyUqyp7m71S4DXPtauYyXm',
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -888,18 +895,16 @@ class RavencoinLiteService extends ChangeNotifier {
     }
   }
 
-  Future<FeeObject> getFees() async {
-    final Map<String, dynamic> requestBody = {"url": await getAPIUrl()};
-
-    final response = await http.post(
-      'https://us-central1-paymint.cloudfunctions.net/api/fees',
-      body: jsonEncode(requestBody),
+  Future<double> getFees() async {
+    final response = await http.get(
+      'https://api.ravencoinlite.org/fee',
       headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      final FeeObject feeObj = FeeObject.fromJson(json.decode(response.body));
-      return feeObj;
+      final int feeRate = json.decode(response.body)['result']['feerate'];
+
+      return (feeRate / pow(10, 4)).toDouble();
     } else {
       throw Exception('Something happened: ' +
           response.statusCode.toString() +

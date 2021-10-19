@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:toast/toast.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:currency_formatter/currency_formatter.dart';
+import 'package:majascan/majascan.dart';
 
 class SendView extends StatefulWidget {
   SendView({Key key}) : super(key: key);
@@ -29,31 +30,33 @@ class _SendViewState extends State<SendView> {
   final _formKey = GlobalKey<FormState>();
 
   // Class atributes for recipient amount
-  TextEditingController satsAmountController;
-  TextEditingController rvlAmountController;
-  TextEditingController fiatAmountController;
+  TextEditingController _satsAmountController;
+  TextEditingController _rvlAmountController;
+  TextEditingController _fiatAmountController;
 
   bool showFinalTxDetails = false;
 
-  dynamic satoshiAmount = 0;
-  dynamic rvlAmount = 0.0;
-  dynamic fiatAmount = 0.00;
+  dynamic _satoshiAmount = 0;
+  dynamic _rvlAmount = 0.0;
+  dynamic _fiatAmount = 0.00;
 
   int currentDenominationSelection = 2; // Defaults to fiat
 
-  int feeSelection = 0; // Defaults to fast
-  String feeDescription = 'Fast >>>';
-
-  FeeObject feeObjectRaw;
+  int feeSelection = 0;
 
   @override
   void initState() {
-    satsAmountController =
-        TextEditingController(text: satoshiAmount.toString());
-    rvlAmountController = TextEditingController(text: rvlAmount.toString());
-    fiatAmountController = TextEditingController(text: fiatAmount.toString());
-
+    _satsAmountController =
+        TextEditingController(text: _satoshiAmount.toString());
+    _rvlAmountController = TextEditingController(text: _rvlAmount.toString());
+    _fiatAmountController = TextEditingController(
+        text: double.tryParse(_fiatAmount.toString()).toStringAsFixed(2));
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -65,12 +68,19 @@ class _SendViewState extends State<SendView> {
       child: Scaffold(
         key: _scaffoldMessengerKey,
         backgroundColor: Color(0xff121212),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color(0xff81D4FA),
+          child: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         bottomNavigationBar: Container(
           height: 100,
           child: FutureBuilder(
-            future: ravencoinLiteService.fees,
-            builder: (BuildContext context, AsyncSnapshot<FeeObject> fees) {
-              if (fees.connectionState == ConnectionState.done) {
+            future: ravencoinLiteService.feeRate,
+            builder: (BuildContext context, AsyncSnapshot<double> fee) {
+              if (fee.connectionState == ConnectionState.done) {
                 return FutureBuilder(
                   future: ravencoinLiteService.ravencoinLitePrice,
                   builder:
@@ -83,7 +93,7 @@ class _SendViewState extends State<SendView> {
                           if (currency.connectionState ==
                               ConnectionState.done) {
                             return buildPreviewButton(
-                                context, fees.data, price.data, currency.data);
+                                context, fee.data, price.data, currency.data);
                           } else {
                             return Container();
                           }
@@ -267,27 +277,24 @@ class _SendViewState extends State<SendView> {
       ),
       actions: [
         ElevatedButton(
-          child: Text('SCAN QR',
-              style: TextStyle(color: Colors.lightBlueAccent.shade700)),
-          //onPressed: () async {
-          //String scan = await MajaScan.startScan(
-          //  title: 'Scan QR Code',
-          //  titleColor: Colors.white,
-          //  qRCornerColor: Colors.lightBlueAccent.shade700,
-          //  qRScannerColor: Colors.lightBlue.shade700,
-//            );
+          child: Text('SCAN QR', style: TextStyle(color: Colors.white)),
+          onPressed: () async {
+            String scan = await MajaScan.startScan(
+              title: 'Scan QR Code',
+              titleColor: Colors.white,
+              qRCornerColor: Colors.lightBlueAccent.shade700,
+              qRScannerColor: Colors.lightBlue.shade700,
+            );
 
-          //        recipientAddressTextController.text = scan.trim();
-          //        },
+            recipientAddressTextController.text = scan.trim();
+          },
         ),
         ElevatedButton(
-          child: Text('CANCEL',
-              style: TextStyle(color: Colors.lightBlueAccent.shade700)),
+          child: Text('CANCEL', style: TextStyle(color: Colors.white)),
           onPressed: () => Navigator.pop(context),
         ),
         ElevatedButton(
-          child: Text('OK',
-              style: TextStyle(color: Colors.lightBlueAccent.shade700)),
+          child: Text('OK', style: TextStyle(color: Colors.white)),
           onPressed: () {
             if (_formKey.currentState.validate()) {
               setState(() {
@@ -303,7 +310,7 @@ class _SendViewState extends State<SendView> {
 
   showSelectAmountToSendView() {
     final RavencoinLiteService ravencoinLiteService =
-        Provider.of<RavencoinLiteService>(context);
+        Provider.of<RavencoinLiteService>(context, listen: false);
 
     showModalBottomSheet(
       isScrollControlled: true,
@@ -333,7 +340,7 @@ class _SendViewState extends State<SendView> {
                         (BuildContext context, AsyncSnapshot<String> currency) {
                       if (currency.connectionState == ConnectionState.done) {
                         return Container(
-                          // height: MediaQuery.of(context).size.height / 1.25,
+                          //height: MediaQuery.of(context).size.height / 1.25,
                           color: Colors.black,
                           padding: EdgeInsets.only(
                               bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -366,7 +373,7 @@ class _SendViewState extends State<SendView> {
                                             changeDenominationSelection(
                                                 1, setState),
                                         child: Text(
-                                          'RVL',
+                                          'SATS',
                                           style: TextStyle(
                                             color: buildSelectionColor(1),
                                             fontWeight: buildSelectionWeight(1),
@@ -400,8 +407,8 @@ class _SendViewState extends State<SendView> {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       SizedBox(height: 8),
-                                      buildAmountInputBox(
-                                          currency.data, price.data)
+                                      buildAmountInputBox(currency.data,
+                                          double.tryParse(price.data))
                                     ],
                                   ),
 
@@ -412,8 +419,8 @@ class _SendViewState extends State<SendView> {
                                     borderRadius: BorderRadius.circular(30),
                                     child: Material(
                                       child: Ink(
-                                        decoration:
-                                            BoxDecoration(color: Colors.amber),
+                                        decoration: BoxDecoration(
+                                            color: Colors.amber.shade100),
                                         child: InkWell(
                                           child: Container(
                                             height: 50,
@@ -435,7 +442,8 @@ class _SendViewState extends State<SendView> {
                                             final RavencoinLiteService
                                                 ravencoinLiteService = Provider
                                                     .of<RavencoinLiteService>(
-                                                        context);
+                                                        context,
+                                                        listen: false);
 
                                             final List<UtxoObject> allOutputs =
                                                 ravencoinLiteService.allOutputs;
@@ -457,16 +465,17 @@ class _SendViewState extends State<SendView> {
 
                                             final int satoshiAmountInt =
                                                 double.parse(
-                                                        satsAmountController
+                                                        _satsAmountController
                                                             .text)
                                                     .toInt();
 
                                             if (satoshiAmountInt == 0) {
                                               this.setState(() {
-                                                satsAmountController.text = '0';
-                                                rvlAmountController.text =
+                                                _satsAmountController.text =
+                                                    '0';
+                                                _rvlAmountController.text =
                                                     '0.0';
-                                                fiatAmountController.text =
+                                                _fiatAmountController.text =
                                                     '0.00';
                                                 showFinalTxDetails = false;
                                               });
@@ -485,10 +494,11 @@ class _SendViewState extends State<SendView> {
                                                 satoshiAmountInt >
                                                     spendableSatoshiAmount) {
                                               this.setState(() {
-                                                satsAmountController.text = '0';
-                                                rvlAmountController.text =
+                                                _satsAmountController.text =
+                                                    '0';
+                                                _rvlAmountController.text =
                                                     '0.0';
-                                                fiatAmountController.text =
+                                                _fiatAmountController.text =
                                                     '0.00';
                                                 showFinalTxDetails = false;
                                               });
@@ -506,10 +516,11 @@ class _SendViewState extends State<SendView> {
                                                 satoshiAmountInt ==
                                                     spendableSatoshiAmount) {
                                               this.setState(() {
-                                                satsAmountController.text = '0';
-                                                rvlAmountController.text =
+                                                _satsAmountController.text =
+                                                    '0';
+                                                _rvlAmountController.text =
                                                     '0.0';
-                                                fiatAmountController.text =
+                                                _fiatAmountController.text =
                                                     '0.00';
                                                 showFinalTxDetails = false;
                                               });
@@ -594,20 +605,22 @@ class _SendViewState extends State<SendView> {
           SizedBox(
             width: 200,
             child: TextField(
-              controller: rvlAmountController,
+              controller: _rvlAmountController,
               keyboardType: TextInputType.number,
               inputFormatters: [NumberRemoveExtraDotFormatter(decimalRange: 8)],
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(suffixText: 'RVL'),
-              onChanged: (String rvlAmount) {
-                final rvlAmountNum = double.parse(rvlAmount);
+              onChanged: (String _rvlAmount) {
+                if (_rvlAmount.isNotEmpty) {
+                  final rvlAmountNum = double.parse(_rvlAmount);
 
-                final satoshiAmount = ((rvlAmountNum * 100000000).toInt());
-                final fiatAmountString =
-                    (rvlAmountNum * ravencoinLitePrice).toStringAsFixed(2);
+                  final _satoshiAmount = ((rvlAmountNum * 100000000).toInt());
+                  final fiatAmountString =
+                      (rvlAmountNum * ravencoinLitePrice).toStringAsFixed(2);
 
-                satsAmountController.text = satoshiAmount.toString();
-                fiatAmountController.text = fiatAmountString;
+                  _satsAmountController.text = _satoshiAmount.toString();
+                  _fiatAmountController.text = fiatAmountString;
+                }
               },
             ),
           ),
@@ -621,19 +634,21 @@ class _SendViewState extends State<SendView> {
           SizedBox(
             width: 200,
             child: TextField(
-              controller: satsAmountController,
+              controller: _satsAmountController,
               keyboardType: TextInputType.numberWithOptions(decimal: false),
               style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(suffixText: 'SATS'),
-              onChanged: (String satoshiAmount) {
-                final satoshiAmountNum = double.parse(satoshiAmount).toInt();
+              decoration: InputDecoration(suffixText: 'RVL'),
+              onChanged: (String _satoshiAmount) {
+                if (_satoshiAmount.isNotEmpty) {
+                  final satoshiAmountNum = double.parse(_satoshiAmount).toInt();
 
-                final rvlAmountNum = satoshiAmountNum / 100000000;
-                final fiatAmountString =
-                    (rvlAmountNum * ravencoinLitePrice).toStringAsFixed(2);
+                  final rvlAmountNum = satoshiAmountNum / 100000000;
+                  final fiatAmountString =
+                      (rvlAmountNum * ravencoinLitePrice).toStringAsFixed(2);
 
-                rvlAmountController.text = rvlAmountNum.toString();
-                fiatAmountController.text = fiatAmountString;
+                  _rvlAmountController.text = rvlAmountNum.toString();
+                  _fiatAmountController.text = fiatAmountString;
+                }
               },
             ),
           ),
@@ -647,22 +662,24 @@ class _SendViewState extends State<SendView> {
           SizedBox(
             width: 200,
             child: TextField(
-              controller: fiatAmountController,
+              controller: _fiatAmountController,
               keyboardType: TextInputType.number,
               inputFormatters: [NumberRemoveExtraDotFormatter(decimalRange: 2)],
               style: TextStyle(color: Colors.white),
               decoration:
                   InputDecoration(prefixText: currencyMap[currency] + ' '),
-              onChanged: (String fiatAmount) {
-                final fiatAmountNum = double.parse(fiatAmount);
+              onChanged: (String _fiatAmount) {
+                if (_fiatAmount.isNotEmpty) {
+                  var fiatAmountNum = double.tryParse(_fiatAmount);
 
-                final rvlAmount =
-                    (fiatAmountNum / ravencoinLitePrice).toStringAsFixed(8);
-                final satoshiAmount =
-                    (double.parse(rvlAmount) * 100000000).toInt();
+                  final _rvlAmount =
+                      (fiatAmountNum / ravencoinLitePrice).toStringAsFixed(8);
+                  final satoshiAmount =
+                      (double.parse(_rvlAmount) * 100000000).toInt();
 
-                rvlAmountController.text = rvlAmount.toString();
-                satsAmountController.text = satoshiAmount.toString();
+                  _rvlAmountController.text = _rvlAmount.toString();
+                  _satsAmountController.text = satoshiAmount.toString();
+                }
               },
             ),
           ),
@@ -673,15 +690,15 @@ class _SendViewState extends State<SendView> {
 
   buildSendAmountText(String currency) {
     if (currentDenominationSelection == 0) {
-      return Text(rvlAmountController.text + ' RVL',
+      return Text(_rvlAmountController.text + ' RVL',
           style: TextStyle(color: Colors.lightBlueAccent.shade700));
     } else if (currentDenominationSelection == 1) {
-      return Text(satsAmountController.text + ' SATS',
+      return Text(_satsAmountController.text + ' SATS',
           style: TextStyle(color: Colors.lightBlueAccent.shade700));
     } else {
       return Text(
         currencyMap[currency] +
-            fiatAmountController.text +
+            _fiatAmountController.text +
             ' worth of Ravencoin Lite',
         style: TextStyle(color: Colors.lightBlueAccent.shade700),
       );
@@ -693,10 +710,10 @@ class _SendViewState extends State<SendView> {
         Provider.of<RavencoinLiteService>(context);
 
     return FutureBuilder(
-      future: ravencoinLiteService.fees,
-      builder: (BuildContext context, AsyncSnapshot<FeeObject> feeObject) {
-        if (feeObject.connectionState == ConnectionState.done) {
-          if (feeObject == null || feeObject.hasError) {
+      future: ravencoinLiteService.feeRate,
+      builder: (BuildContext context, AsyncSnapshot<double> fee) {
+        if (fee.connectionState == ConnectionState.done) {
+          if (fee == null || fee.hasError) {
             return ListTile(
               title: Text(
                 'Could not fetch fee info.\nPlease check connection',
@@ -706,11 +723,10 @@ class _SendViewState extends State<SendView> {
           }
 
           return ListTile(
-            title:
-                Text('Fee selection:', style: TextStyle(color: Colors.white)),
-            trailing: Text(feeDescription,
+            title: Text('Fee Rate:', style: TextStyle(color: Colors.white)),
+            trailing: Text(fee.data.toStringAsFixed(8) + ' RVL/kB',
                 style: TextStyle(color: Colors.lightBlueAccent.shade700)),
-            onTap: () => showFeeSelectionModal(),
+            //onTap: () => showFeeSelectionModal(),
           );
         } else {
           return ListTile(
@@ -739,9 +755,9 @@ class _SendViewState extends State<SendView> {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return FutureBuilder(
-              future: ravencoinLiteService.fees,
-              builder: (BuildContext context, AsyncSnapshot<FeeObject> feeObj) {
-                if (feeObj.connectionState == ConnectionState.done) {
+              future: ravencoinLiteService.feeRate,
+              builder: (BuildContext context, AsyncSnapshot<double> fee) {
+                if (fee.connectionState == ConnectionState.done) {
                   return Material(
                     color: Colors.black,
                     child: Column(
@@ -758,54 +774,20 @@ class _SendViewState extends State<SendView> {
                         SizedBox(height: 12),
                         ListTile(
                           title: Text(
-                            feeObj.data.fast.toString() + ' sats/vByte',
+                            fee.data.toStringAsFixed(8) + ' RVL/kB',
                             style: TextStyle(color: buildColorForTiles(0)),
                           ),
-                          trailing: Text('Fast >>>',
-                              style: TextStyle(color: buildColorForTiles(0))),
-                          onTap: () {
-                            setState(() {
-                              feeSelection = 0;
-                            });
-                            this.setState(() {
-                              feeDescription = 'Fast >>>';
-                            });
-                            Navigator.pop(context);
-                          },
-                        ),
-                        ListTile(
-                          title: Text(
-                            feeObj.data.medium.toString() + ' sats/vByte',
-                            style: TextStyle(color: buildColorForTiles(1)),
-                          ),
-                          trailing: Text('Medium >>',
-                              style: TextStyle(color: buildColorForTiles(1))),
-                          onTap: () {
-                            setState(() {
-                              feeSelection = 1;
-                            });
-                            this.setState(() {
-                              feeDescription = 'Medium >>';
-                            });
-                            Navigator.pop(context);
-                          },
-                        ),
-                        ListTile(
-                          title: Text(
-                            feeObj.data.slow.toString() + ' sats/vByte',
-                            style: TextStyle(color: buildColorForTiles(2)),
-                          ),
-                          trailing: Text('Slow >',
-                              style: TextStyle(color: buildColorForTiles(2))),
-                          onTap: () {
-                            setState(() {
-                              feeSelection = 2;
-                            });
-                            this.setState(() {
-                              feeDescription = 'Slow >';
-                            });
-                            Navigator.pop(context);
-                          },
+                          //trailing: Text('Fast >>>',
+                          //    style: TextStyle(color: buildColorForTiles(0))),
+                          //onTap: () {
+                          //  setState(() {
+                          //    feeSelection = 0;
+                          //  });
+                          //  this.setState(() {
+                          //    feeDescription = 'Fast >>>';
+                          //  });
+                          //  Navigator.pop(context);
+                          //},
                         ),
                       ],
                     ),
@@ -819,7 +801,7 @@ class _SendViewState extends State<SendView> {
         });
   }
 
-  buildPreviewButton(BuildContext context, FeeObject feeObjRaw,
+  buildPreviewButton(BuildContext context, double fee,
       dynamic ravencoinLitePrice, String currency) {
     if (showFinalTxDetails) {
       return Center(
@@ -831,7 +813,7 @@ class _SendViewState extends State<SendView> {
               child: InkWell(
                 onTap: () async {
                   final RavencoinLiteService ravencoinLiteService =
-                      Provider.of<RavencoinLiteService>(context);
+                      Provider.of<RavencoinLiteService>(context, listen: false);
                   // Show loading dialog
                   showModal(
                     context: context,
@@ -842,23 +824,13 @@ class _SendViewState extends State<SendView> {
                     },
                   );
 
-                  dynamic feeChosen;
-
-                  if (this.feeSelection == 0) {
-                    feeChosen = feeObjRaw.fast;
-                  } else if (this.feeSelection == 1) {
-                    feeChosen = feeObjRaw.medium;
-                  } else if (this.feeSelection == 2) {
-                    feeChosen = feeObjRaw.slow;
-                  }
-
                   final int satoshiAmountToSend =
-                      double.parse(satsAmountController.text).toInt();
+                      double.parse(_satsAmountController.text).toInt();
 
                   dynamic txHexOrError =
                       await ravencoinLiteService.coinSelection(
                     satoshiAmountToSend,
-                    feeChosen,
+                    fee,
                     recipientAddressTextController.text,
                   );
 
@@ -981,8 +953,8 @@ AlertDialog exactAmountDialog(BuildContext _) {
   return AlertDialog(
     backgroundColor: Colors.black,
     title: Text(
-      'Not enough Ravencoin Lite',
-      style: TextStyle(color: Colors.white),
+      'Not enough RVL',
+      style: TextStyle(color: Colors.lightBlueAccent.shade700),
     ),
     content: Text(
       'You cannot spend an amount exactly equal to what you currently have spendable. You must leave some over to pay for the transaction fee.',
@@ -993,7 +965,7 @@ AlertDialog exactAmountDialog(BuildContext _) {
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
-          style: TextStyle(color: Colors.lightBlueAccent.shade700),
+          style: TextStyle(color: Colors.white),
         ),
       )
     ],
@@ -1004,8 +976,8 @@ AlertDialog zeroAmountDialog(BuildContext _) {
   return AlertDialog(
     backgroundColor: Colors.black,
     title: Text(
-      'Not enough Ravencoin Lite',
-      style: TextStyle(color: Colors.white),
+      'Not enough RVL',
+      style: TextStyle(color: Colors.lightBlueAccent.shade700),
     ),
     content: Text(
       'You cannot spend nothing. Please modify amount and remember to leave some over for transaction fees.',
@@ -1016,7 +988,7 @@ AlertDialog zeroAmountDialog(BuildContext _) {
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
-          style: TextStyle(color: Colors.lightBlueAccent.shade700),
+          style: TextStyle(color: Colors.white),
         ),
       )
     ],
@@ -1027,8 +999,8 @@ AlertDialog tooMuchDialog(BuildContext _) {
   return AlertDialog(
     backgroundColor: Colors.black,
     title: Text(
-      'Not enough Ravencoin Lite',
-      style: TextStyle(color: Colors.white),
+      'Not enough RVL',
+      style: TextStyle(color: Colors.lightBlueAccent.shade700),
     ),
     content: Text(
       'You cannot spend an amount more than what you currently have spendable. Please modify amount and remember to leave some over for transaction fees.',
@@ -1039,7 +1011,7 @@ AlertDialog tooMuchDialog(BuildContext _) {
         onPressed: () => Navigator.pop(_),
         child: Text(
           'OK',
-          style: TextStyle(color: Colors.lightBlueAccent.shade700),
+          style: TextStyle(color: Colors.white),
         ),
       )
     ],

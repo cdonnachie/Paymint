@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 import 'package:provider/provider.dart';
-import 'package:bip39/bip39.dart' as bip39;
 import 'package:ravencointlite/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -22,8 +21,11 @@ class _RestoreWalletViewState extends State<RestoreWalletView> {
         child: Center(
           child: CupertinoButton.filled(
             onPressed: () async {
-              //if (bip39.validateMnemonic(textController.text.trim()) == false) {
-              if (1 == 2) {
+              final rvlService =
+                  Provider.of<RavencoinLiteService>(context, listen: false);
+              if (await rvlService
+                      .validateAddress(textController.text.trim()) ==
+                  false) {
                 showModal(
                   context: context,
                   configuration: FadeScaleTransitionConfiguration(),

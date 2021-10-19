@@ -106,7 +106,7 @@ class _LockscreenViewState extends State<LockscreenView> {
                       ),
                     );
                     await Future.delayed(Duration(milliseconds: 600));
-                    Navigator.pushReplacementNamed(context, '/mainview');
+                    Navigator.pushNamed(context, '/mainview');
                   } else {
                     FocusScope.of(context).unfocus();
 
